@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Bot } from "lucide-react"
 import { useAgentStore } from "@/lib/store"
@@ -54,7 +55,7 @@ export default function CreateAgentPage() {
 
       {/* Progress Steps */}
       <div className="bg-background border-b border-border">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container max-w-6xl  mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center space-x-2">
@@ -90,7 +91,26 @@ export default function CreateAgentPage() {
       </div>
 
       {/* Step Content */}
-      <CurrentStepComponent />
+      <div className="overflow-hidden">
+        <AnimatePresence mode="wait" custom={currentStep}>
+          <motion.div
+            key={currentStep}
+            custom={currentStep}
+            initial={{ opacity: 0, x: 300 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -300 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
+              duration: 0.3
+            }}
+            className="w-full"
+          >
+            <CurrentStepComponent />
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Navigation */}
       <div className="container mx-auto px-4 py-8">

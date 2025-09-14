@@ -49,16 +49,14 @@ export function StrategyStep() {
       <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
         {/* Form Section */}
         <div className="space-y-6">
-          <FadeIn delay={0.2}>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Agent Strategy</h1>
-              <p className="text-muted-foreground text-balance">
-                Configure your agent's trading approach, risk tolerance, and the tools it will use to make decisions.
-              </p>
-            </div>
-          </FadeIn>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Agent Strategy</h1>
+            <p className="text-muted-foreground text-balance">
+              Configure your agent's trading approach, risk tolerance, and the tools it will use to make decisions.
+            </p>
+          </div>
 
-          <AnimatedCard delay={0.3} className="border-primary/20">
+          <AnimatedCard className="glass-card border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground">Risk Appetite</CardTitle>
               <CardDescription>Choose your agent's risk tolerance level</CardDescription>
@@ -90,7 +88,7 @@ export function StrategyStep() {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard delay={0.4} className="border-primary/20">
+          <AnimatedCard className="glass-card border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground">Asset Types</CardTitle>
               <CardDescription>Select the types of assets your agent can trade</CardDescription>
@@ -115,7 +113,7 @@ export function StrategyStep() {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard delay={0.5} className="border-primary/20">
+          <AnimatedCard className="glass-card border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground">MCP Tools</CardTitle>
               <CardDescription>Choose the analysis tools your agent will use</CardDescription>
@@ -143,13 +141,11 @@ export function StrategyStep() {
 
         {/* Preview Section */}
         <div className="space-y-6">
-          <FadeIn delay={0.6}>
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-4">Strategy Preview</h2>
-            </div>
-          </FadeIn>
+          <div>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Strategy Preview</h2>
+          </div>
 
-          <AnimatedCard delay={0.7} className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+          <AnimatedCard className="glass-card border-primary/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6 space-y-4">
               <div>
                 <h3 className="font-semibold text-foreground mb-2">Risk Profile</h3>

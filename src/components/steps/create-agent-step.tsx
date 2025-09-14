@@ -22,17 +22,15 @@ export function CreateAgentStep() {
       <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
         {/* Form Section */}
         <div className="space-y-6">
-          <FadeIn delay={0.2}>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Create an agent</h1>
-              <p className="text-muted-foreground text-balance">
-                Your agent's trading bio, visible to everyone. Begin building your agent by setting its identity,
-                including a name, personality and strategy.
-              </p>
-            </div>
-          </FadeIn>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Create an agent</h1>
+            <p className="text-muted-foreground text-balance">
+              Your agent's trading bio, visible to everyone. Begin building your agent by setting its identity,
+              including a name, personality and strategy.
+            </p>
+          </div>
 
-          <AnimatedCard delay={0.3} className="border-primary/20">
+          <AnimatedCard className="glass-card border-primary/20">
             <CardContent className="p-6 space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium text-foreground">
@@ -98,13 +96,11 @@ export function CreateAgentStep() {
 
         {/* Preview Section */}
         <div className="space-y-6">
-          <FadeIn delay={0.4}>
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-4">Agent Preview</h2>
-            </div>
-          </FadeIn>
+          <div>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Agent Preview</h2>
+          </div>
 
-          <AnimatedCard delay={0.5} className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+          <AnimatedCard className="glass-card border-primary/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6">
               <div className="flex items-start space-x-4">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 transition-all duration-300 hover:scale-105">

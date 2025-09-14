@@ -48,16 +48,14 @@ export function DeployStep() {
       <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
         {/* Form Section */}
         <div className="space-y-6">
-          <FadeIn delay={0.2}>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Deploy Agent</h1>
-              <p className="text-muted-foreground text-balance">
-                Set your launch parameters and deploy your AI trading agent to the blockchain.
-              </p>
-            </div>
-          </FadeIn>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Deploy Agent</h1>
+            <p className="text-muted-foreground text-balance">
+              Set your launch parameters and deploy your AI trading agent to the blockchain.
+            </p>
+          </div>
 
-          <AnimatedCard delay={0.3} className="border-primary/20">
+          <AnimatedCard className="glass-card border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground">Launch Parameters</CardTitle>
               <CardDescription>Configure the initial settings for your agent launch</CardDescription>
@@ -113,7 +111,7 @@ export function DeployStep() {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard delay={0.4} className="border-primary/20">
+          <AnimatedCard className="glass-card border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground">Deployment Cost</CardTitle>
               <CardDescription>Estimated costs for deploying your agent</CardDescription>
@@ -182,13 +180,11 @@ export function DeployStep() {
 
         {/* Preview Section */}
         <div className="space-y-6">
-          <FadeIn delay={0.5}>
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-4">Launch Summary</h2>
-            </div>
-          </FadeIn>
+          <div>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Launch Summary</h2>
+          </div>
 
-          <AnimatedCard delay={0.6} className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+          <AnimatedCard className="glass-card border-primary/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center space-x-3">
                 <DollarSign className="h-5 w-5 text-primary" />

@@ -14,10 +14,10 @@ interface AnimatedCardProps extends React.ComponentProps<typeof Card> {
 export function AnimatedCard({ className, delay = 0, children, ...props }: AnimatedCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 1, y: 0 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
       whileHover={{ y: -2 }}
+      transition={{ duration: 0.2 }}
     >
       <Card className={cn("transition-shadow duration-200 hover:shadow-lg", className)} {...props}>
         {children}
