@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { DM_Sans, DM_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
+import Providers from "@/providers/PrivyProvider";
+import Navbar from "@/components/shared/navbar";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-});
-
-const dmMono = DM_Mono({
-  variable: "--font-dm-mono",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500"],
 });
@@ -27,9 +23,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${dmSans.className} ${dmMono.variable} antialiased bg-background text-foreground min-h-screen`}
+        className={`${poppins.className} ${poppins.variable} antialiased bg-background text-foreground min-h-screen`}
       >
-        {children}
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );
