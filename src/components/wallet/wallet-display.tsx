@@ -16,6 +16,7 @@ import {
   User,
 } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
+import Link from "next/link";
 
 export default function WalletDisplay() {
   const { user, logout } = usePrivy();
@@ -30,9 +31,9 @@ export default function WalletDisplay() {
       <HoverCardTrigger asChild>
         <Button
           variant="ghost"
-          className="flex items-center gap-2 text-white hover:bg-white/10 cursor-pointer"
+          className="bg-neutral-900 pl-2 p-5 flex items-center gap-2 text-white hover:bg-white/10 cursor-pointer rounded-full border border-white/30"
         >
-          <div className="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-neutral-800  flex items-center justify-center">
             <Wallet className="w-4 h-4 text-white" />
           </div>
           <span className="font-mono text-sm">{truncatedAddress}</span>
@@ -43,7 +44,7 @@ export default function WalletDisplay() {
           {/* Wallet Address Section */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 p-3 bg-neutral-800 rounded-xl">
-              <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center">
                 <Wallet className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
@@ -95,12 +96,14 @@ export default function WalletDisplay() {
 
 function MenuItem({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <Button
-      variant="ghost"
-      className="w-full justify-start text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-lg cursor-pointer"
-    >
-      {icon}
-      <span className="ml-2">{text}</span>
-    </Button>
+    <Link href="/profile">
+      <Button
+        variant="ghost"
+        className="w-full justify-start text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-lg cursor-pointer"
+      >
+        {icon}
+        <span className="ml-2">{text}</span>
+      </Button>
+    </Link>
   );
 }
