@@ -5,7 +5,7 @@ import ConnectWalletButton from "../wallet/connect-wallet-button";
 
 export default function Navbar() {
   return (
-    <header className="border-b border-border bg-card/50 backdrop-blur-sm">
+    <header className="border-b border-border bg-card/50 sticky top-0 z-50 backdrop-blur-sm">
       <div className="container max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
         <div className="flex items-center space-x-0.5">
           <Image src={"/logo-white.png"}
@@ -16,13 +16,13 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center space-x-8" >
-          <Link href="/discover" className="text-base text-foreground hover:text-foreground/80">
+          <Link href="/" className="text-base text-foreground hover:text-foreground/80">
             Discover
           </Link>
-          <Link href="/about" className="text-base text-foreground hover:text-foreground/80">
+          <Link href="#" className="text-base text-foreground hover:text-foreground/80">
             About
           </Link>
-          <Link href="/support" className="text-base text-foreground hover:text-foreground/80">
+          <Link href="#" className="text-base text-foreground hover:text-foreground/80">
             Support
           </Link>
         </div>

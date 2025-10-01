@@ -1,12 +1,12 @@
-import { mainnet, sepolia } from "viem/chains";
+import { linea, lineaSepolia } from "viem/chains";
 import { http } from "wagmi";
 
 import { createConfig } from "@privy-io/wagmi";
 
 export const wagmiConfig = createConfig({
-  chains: [mainnet, sepolia],
+  chains: [linea, lineaSepolia],
   transports: {
-    [mainnet.id]: http(),
-    [sepolia.id]: http(),
+    [linea.id]: http(),
+    [lineaSepolia.id]: http(),
   },
 });

@@ -10,17 +10,13 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 
 type Agent = {
   id: string;
@@ -176,6 +172,8 @@ function AgentsTable() {
   ]);
   const [searchFilter, setSearchFilter] = useState("");
 
+  const router = useRouter();
+
   const filteredData = data.filter((agent) => {
     if (!searchFilter) return true;
 
@@ -265,7 +263,8 @@ function AgentsTable() {
               filteredData.map((agent) => (
                 <TableRow
                   key={agent.id}
-                  className="border-neutral-700 hover:bg-neutral-800"
+                  className="border-neutral-700 hover:bg-neutral-800 cursor-pointer"
+                  onClick={() => router.push(`/agent/${agent.id}`)}
                 >
                   {visibleColumns.includes("Agent") && (
                     <TableCell className="font-medium whitespace-nowrap">
