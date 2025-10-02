@@ -1,14 +1,34 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "@/providers/PrivyProvider";
 import Navbar from "@/components/shared/navbar";
-import { Footer } from "@/components/ui/footer";
+import SmoothScrolling from "@/components/shared/smooth-scrolling";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
+const styreneA = localFont({
+  src: [
+    {
+      path: "../fonts/StyreneA-Light.otf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../fonts/StyreneA-Regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/StyreneA-Medium.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../fonts/StyreneA-Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-styrene-a",
 });
 
 export const metadata: Metadata = {
@@ -24,11 +44,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${poppins.className} ${poppins.variable} antialiased bg-background text-foreground min-h-screen`}
+        className={`${styreneA.className} ${styreneA.variable} antialiased bg-background text-foreground min-h-screen`}
       >
         <Providers>
-          <Navbar />
-          {children}
+          <SmoothScrolling>
+            <Navbar />
+            {children}
+          </SmoothScrolling>
         </Providers>
       </body>
     </html>

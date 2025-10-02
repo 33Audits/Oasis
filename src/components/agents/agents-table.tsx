@@ -17,7 +17,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-
 type Agent = {
   id: string;
   name: string;
@@ -120,8 +119,7 @@ const data: Agent[] = [
     id: "8",
     name: "Agent",
     symbol: "AGENT",
-    avatar:
-      "/33labs.jpg",
+    avatar: "/33labs.jpg",
     tags: ["AI", "ML", "Auto"],
     marketCap: "$923K",
     change1d: "+2.1%",
@@ -195,7 +193,7 @@ function AgentsTable() {
   return (
     <div className="max-w-7xl mx-auto w-full container my-10 space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
       <div className="flex flex-wrap gap-4 items-center justify-between mb-12">
-        <h2 className="text-5xl font-bold text-neutral-300">Agents</h2>
+        <h2 className="text-5xl font-normal text-white">Agents</h2>
         <div className="flex gap-3 flex-wrap">
           <Input
             placeholder="Search agents, symbols, or tags..."
@@ -224,11 +222,6 @@ function AgentsTable() {
               {visibleColumns.includes("Symbol") && (
                 <TableHead className="w-[100px] text-neutral-300">
                   Symbol
-                </TableHead>
-              )}
-              {visibleColumns.includes("Tags") && (
-                <TableHead className="w-[150px] text-neutral-300">
-                  Tags
                 </TableHead>
               )}
               {visibleColumns.includes("Market Cap") && (
@@ -280,23 +273,8 @@ function AgentsTable() {
                     </TableCell>
                   )}
                   {visibleColumns.includes("Symbol") && (
-                    <TableCell className="whitespace-nowrap text-neutral-300">
+                    <TableCell className="whitespace-nowrap font-mono text-neutral-300">
                       {agent.symbol}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Tags") && (
-                    <TableCell className="whitespace-nowrap">
-                      <div className="flex flex-wrap gap-1">
-                        {agent.tags.map((tag, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="secondary"
-                            className="bg-neutral-700 text-neutral-300 text-xs"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Market Cap") && (
