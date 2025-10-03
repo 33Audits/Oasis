@@ -29,7 +29,7 @@ export function VaultStep() {
             </p>
           </div>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardHeader>
               <CardTitle className="text-foreground">Profit Distribution</CardTitle>
               <CardDescription>How should profits be shared between token holders and the vault?</CardDescription>
@@ -80,7 +80,7 @@ export function VaultStep() {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardHeader>
               <CardTitle className="text-foreground">Distribution Method</CardTitle>
               <CardDescription>How should profits be distributed to token holders?</CardDescription>
@@ -112,7 +112,7 @@ export function VaultStep() {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardHeader>
               <CardTitle className="text-foreground">Performance Fee</CardTitle>
               <CardDescription>Set a performance fee for successful trades</CardDescription>
@@ -141,7 +141,7 @@ export function VaultStep() {
             <h2 className="text-xl font-semibold text-foreground mb-4">Vault Preview</h2>
           </div>
 
-          <AnimatedCard className="glass-card border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+          <AnimatedCard className="glass-card border-white/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center space-x-3">
                 <Wallet className="h-5 w-5 text-primary" />

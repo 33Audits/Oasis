@@ -30,7 +30,7 @@ export function CreateAgentStep() {
             </p>
           </div>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardContent className="p-6 space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium text-foreground">
@@ -103,7 +103,7 @@ export function CreateAgentStep() {
           <AnimatedCard className="glass-card border-white/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6">
               <div className="flex items-start space-x-4">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 transition-all duration-300 hover:scale-105">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-white/20 transition-all duration-300 hover:scale-105">
                   {formData.name ? (
                     <span className="text-primary font-bold text-lg">{formData.name.charAt(0).toUpperCase()}</span>
                   ) : (
@@ -126,7 +126,7 @@ export function CreateAgentStep() {
               </div>
 
               {formData.lpAllocation[0] !== 60 && (
-                <div className="mt-4 pt-4 border-t border-primary/20">
+                <div className="mt-4 pt-4 border-t border-white/20">
                   <div className="text-sm text-neutral-400 mb-2">Strategy Allocation</div>
                   <div className="flex space-x-2">
                     <div

@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${styreneA.className} ${styreneA.variable} antialiased bg-background text-foreground min-h-screen`}
+        className={`${styreneA.className} ${styreneA.variable} antialiased bg-background text-foreground`}
       >
         <Providers>
           <SmoothScrolling>

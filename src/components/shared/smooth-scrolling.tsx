@@ -5,12 +5,18 @@ import Lenis from "lenis";
 
 export default function SmoothScrolling({
   children,
+  disabled = false,
 }: {
   children: React.ReactNode;
+  disabled?: boolean;
 }) {
   const lenisRef = useRef<Lenis>(null);
 
   useEffect(() => {
+    // Check if smooth scrolling should be disabled for this page
+    const shouldDisable = disabled || document.querySelector('[data-disable-smooth-scroll]') !== null;
+    if (shouldDisable) return;
+
     // Initialize Lenis
     const lenis = new Lenis({
       duration: 1.2,
@@ -35,14 +41,18 @@ export default function SmoothScrolling({
     return () => {
       lenis.destroy();
     };
-  }, []);
+  }, [disabled]);
 
   useEffect(() => {
+    // Check if smooth scrolling should be disabled for this page
+    const shouldDisable = disabled || document.querySelector('[data-disable-smooth-scroll]') !== null;
+    if (shouldDisable) return;
+
     // Custom scrollTo function
     const scrollToElement = (target: string) => {
       if (lenisRef.current) {
         lenisRef.current.scrollTo(target, {
-          offset: -80,
+          offset: -120,
           duration: 1.5,
           easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         });
@@ -64,7 +74,7 @@ export default function SmoothScrolling({
     return () => {
       delete (window as any).smoothScrollTo;
     };
-  }, []);
+  }, [disabled]);
 
   return <>{children}</>;
 }

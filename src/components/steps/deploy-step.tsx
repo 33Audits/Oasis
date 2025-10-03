@@ -55,7 +55,7 @@ export function DeployStep() {
             </p>
           </div>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardHeader>
               <CardTitle className="text-foreground">Launch Parameters</CardTitle>
               <CardDescription>Configure the initial settings for your agent launch</CardDescription>
@@ -111,7 +111,7 @@ export function DeployStep() {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardHeader>
               <CardTitle className="text-foreground">Deployment Cost</CardTitle>
               <CardDescription>Estimated costs for deploying your agent</CardDescription>
@@ -144,7 +144,7 @@ export function DeployStep() {
           )}
 
           {isDeploying && (
-            <AnimatedCard className="border-primary/20">
+            <AnimatedCard className="border-white/20">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
@@ -184,7 +184,7 @@ export function DeployStep() {
             <h2 className="text-xl font-semibold text-foreground mb-4">Launch Summary</h2>
           </div>
 
-          <AnimatedCard className="glass-card border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+          <AnimatedCard className="glass-card border-white/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center space-x-3">
                 <DollarSign className="h-5 w-5 text-primary" />

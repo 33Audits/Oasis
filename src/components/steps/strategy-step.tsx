@@ -56,7 +56,7 @@ export function StrategyStep() {
             </p>
           </div>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardHeader>
               <CardTitle className="text-foreground">Risk Appetite</CardTitle>
               <CardDescription>Choose your agent's risk tolerance level</CardDescription>
@@ -88,7 +88,7 @@ export function StrategyStep() {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardHeader>
               <CardTitle className="text-foreground">Asset Types</CardTitle>
               <CardDescription>Select the types of assets your agent can trade</CardDescription>
@@ -113,7 +113,7 @@ export function StrategyStep() {
             </CardContent>
           </AnimatedCard>
 
-          <AnimatedCard className="glass-card border-primary/20">
+          <AnimatedCard className="glass-card border-white/20">
             <CardHeader>
               <CardTitle className="text-foreground">MCP Tools</CardTitle>
               <CardDescription>Choose the analysis tools your agent will use</CardDescription>
@@ -145,7 +145,7 @@ export function StrategyStep() {
             <h2 className="text-xl font-semibold text-foreground mb-4">Strategy Preview</h2>
           </div>
 
-          <AnimatedCard className="glass-card border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+          <AnimatedCard className="glass-card border-white/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6 space-y-4">
               <div>
                 <h3 className="font-semibold text-foreground mb-2">Risk Profile</h3>
