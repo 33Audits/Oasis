@@ -123,7 +123,7 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="my-8 px- max-w-7xl text-white/70 mx-auto">
+    <footer className="my-8 px-4 max-w-7xl text-white/70 mx-auto">
       <div className="relative  border border-primary/35 rounded-3xl max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="hidden md:block absolute -top-4 -left-8 w-[80px] h-[36px] scale-75">
           {tape}
@@ -147,10 +147,10 @@ export const Footer = () => {
 
           <div className="flex flex-col md:mx-4 md:flex-row gap-2 md:gap-20 items-start md:items-start">
             <div className="flex flex-col gap-1 md:gap-4">
-              <h4 className="uppercase font-display text-md text-white/90 font-semibold">
+              <h4 className="uppercase mt-4 md:mt-0 font-display text-md text-white/90 font-semibold">
                 Platform
               </h4>
-              <div className="flex flex-wrap md:flex-col gap-2 text-sm text-neutral items-start ">
+              <div className="flex flex-col gap-2 text-sm text-neutral items-start ">
                 <Link
                   className="text-neutral/50 whitespace-nowrap font-light"
                   href="/create"
@@ -199,11 +199,11 @@ export const Footer = () => {
               </div>
             </div>
 
-            <div className="hidden md:flex flex-col gap-1 md:gap-4">
+            <div className="flex mt-4 md:mt-0 flex-col gap-1 md:gap-4">
               <h4 className="uppercase whitespace-nowrap font-lightfont-display text-md text-white/90 font-semibold">
                 Ecosystem
               </h4>
-              <div className="flex gap-2 flex-wrap md:flex-col text-sm text-neutral items-start ">
+              <div className="flex gap-2 flex-col text-sm text-neutral items-start ">
                 <Link
                   className="pointer-events-none text-neutral/50 whitespace-nowrap font-light"
                   href="#"
