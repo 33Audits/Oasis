@@ -23,7 +23,7 @@ export function VaultStep() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Vault Policies</h1>
-            <p className="text-muted-foreground text-balance">
+            <p className="text-neutral-400 text-balance">
               Configure how profits are distributed, token selection criteria, and access controls for your agent's
               vault.
             </p>
@@ -71,7 +71,7 @@ export function VaultStep() {
                   />
                   <div className="flex justify-between text-sm">
                     <span className="text-primary font-medium">{(formData.customSplit || [70])[0]}% to holders</span>
-                    <span className="text-muted-foreground font-medium">
+                    <span className="text-neutral-400 font-medium">
                       {100 - (formData.customSplit || [70])[0]}% to vault
                     </span>
                   </div>
@@ -127,7 +127,7 @@ export function VaultStep() {
                   step={1}
                   className="w-full"
                 />
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-neutral-400">
                   {(formData.performanceFee || [10])[0]}% fee on profitable trades
                 </div>
               </div>
@@ -147,7 +147,7 @@ export function VaultStep() {
                 <Wallet className="h-5 w-5 text-primary" />
                 <div>
                   <h3 className="font-semibold text-foreground">Profit Split</h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-neutral-400 text-sm">
                     {formData.profitSplit === "custom"
                       ? `${(formData.customSplit || [70])[0]}% holders, ${100 - (formData.customSplit || [70])[0]}% vault`
                       : formData.profitSplit || "Not configured"}
@@ -159,7 +159,7 @@ export function VaultStep() {
                 <Users className="h-5 w-5 text-primary" />
                 <div>
                   <h3 className="font-semibold text-foreground">Distribution</h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-neutral-400 text-sm">
                     {formData.distributionMethod === "automatic" && "Automatic distribution"}
                     {formData.distributionMethod === "claim" && "Claim-based distribution"}
                     {formData.distributionMethod === "reinvest" && "Auto-reinvest profits"}
@@ -172,7 +172,7 @@ export function VaultStep() {
                 <Lock className="h-5 w-5 text-primary" />
                 <div>
                   <h3 className="font-semibold text-foreground">Performance Fee</h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-neutral-400 text-sm">
                     {(formData.performanceFee || [10])[0]}% on profitable trades
                   </p>
                 </div>

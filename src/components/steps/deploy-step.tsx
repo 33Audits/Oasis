@@ -38,7 +38,7 @@ export function DeployStep() {
       setDeployProgress((i + 1) * 20)
     }
 
-    setIsDeploying(false)
+    setIsDeploying(false);
   }
 
   const estimatedCost = 0.05 + (parseFloat(formData.fundingGoal) || 0) * 0.001
@@ -50,7 +50,7 @@ export function DeployStep() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Deploy Agent</h1>
-            <p className="text-muted-foreground text-balance">
+            <p className="text-neutral-400 text-balance">
               Set your launch parameters and deploy your AI trading agent to the blockchain.
             </p>
           </div>
@@ -118,11 +118,11 @@ export function DeployStep() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Smart Contract Deployment</span>
+                <span className="text-neutral-400">Smart Contract Deployment</span>
                 <span className="text-foreground">0.05 ETH</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Initial Liquidity</span>
+                <span className="text-neutral-400">Initial Liquidity</span>
                 <span className="text-foreground">{(parseFloat(formData.fundingGoal) || 0) * 0.001} ETH</span>
               </div>
               <div className="border-t border-border pt-2 flex justify-between font-medium">
@@ -135,7 +135,7 @@ export function DeployStep() {
           {!isDeploying && deployProgress === 0 && (
             <Button
               onClick={handleDeploy}
-              className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-primary-foreground"
+              className="w-full bg-white text-black rounded-xl hover:bg-white/90"
               disabled={!formData.buyAmount || !formData.fundingGoal}
             >
               <Rocket className="mr-2 h-4 w-4" />
@@ -152,7 +152,7 @@ export function DeployStep() {
                     <span className="text-foreground font-medium">Deploying Agent...</span>
                   </div>
                   <Progress value={deployProgress} className="w-full" />
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-neutral-400">
                     {deployProgress < 20 && "Creating smart contract..."}
                     {deployProgress >= 20 && deployProgress < 40 && "Deploying to blockchain..."}
                     {deployProgress >= 40 && deployProgress < 60 && "Setting up liquidity pool..."}
@@ -169,7 +169,7 @@ export function DeployStep() {
               <CardContent className="p-6 text-center">
                 <div className="space-y-2">
                   <div className="text-green-500 font-semibold">🎉 Agent Deployed Successfully!</div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-neutral-400">
                     Your AI trading agent is now live and ready to start trading.
                   </p>
                 </div>
@@ -190,7 +190,7 @@ export function DeployStep() {
                 <DollarSign className="h-5 w-5 text-primary" />
                 <div>
                   <h3 className="font-semibold text-foreground">Initial Investment</h3>
-                  <p className="text-muted-foreground text-sm">{formData.buyAmount || 0} ETH token purchase</p>
+                  <p className="text-neutral-400 text-sm">{formData.buyAmount || 0} ETH token purchase</p>
                 </div>
               </div>
 
@@ -198,7 +198,7 @@ export function DeployStep() {
                 <Target className="h-5 w-5 text-primary" />
                 <div>
                   <h3 className="font-semibold text-foreground">Funding Goal</h3>
-                  <p className="text-muted-foreground text-sm">{formData.fundingGoal || "0"} ETH target</p>
+                  <p className="text-neutral-400 text-sm">{formData.fundingGoal || "0"} ETH target</p>
                 </div>
               </div>
 
@@ -206,7 +206,7 @@ export function DeployStep() {
                 <Clock className="h-5 w-5 text-primary" />
                 <div>
                   <h3 className="font-semibold text-foreground">Launch Timing</h3>
-                  <p className="text-muted-foreground text-sm">{formData.launchDelay || 0} hours delay</p>
+                  <p className="text-neutral-400 text-sm">{formData.launchDelay || 0} hours delay</p>
                 </div>
               </div>
             </CardContent>

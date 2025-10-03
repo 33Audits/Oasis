@@ -51,7 +51,7 @@ export function StrategyStep() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Agent Strategy</h1>
-            <p className="text-muted-foreground text-balance">
+            <p className="text-neutral-400 text-balance">
               Configure your agent's trading approach, risk tolerance, and the tools it will use to make decisions.
             </p>
           </div>
@@ -149,7 +149,7 @@ export function StrategyStep() {
             <CardContent className="p-6 space-y-4">
               <div>
                 <h3 className="font-semibold text-foreground mb-2">Risk Profile</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-neutral-400 text-sm">
                   {formData.riskAppetite
                     ? riskLevels.find((r) => r.id === formData.riskAppetite)?.description || "Not selected"
                     : "Select a risk level"}
@@ -158,7 +158,7 @@ export function StrategyStep() {
 
               <div>
                 <h3 className="font-semibold text-foreground mb-2">Asset Focus</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-neutral-400 text-sm">
                   {formData.assetTypes?.length
                     ? `Trading ${formData.assetTypes.length} asset types`
                     : "No assets selected"}
@@ -167,7 +167,7 @@ export function StrategyStep() {
 
               <div>
                 <h3 className="font-semibold text-foreground mb-2">Analysis Tools</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-neutral-400 text-sm">
                   {formData.mcpTools?.length ? `Using ${formData.mcpTools.length} analysis tools` : "No tools selected"}
                 </p>
               </div>

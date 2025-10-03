@@ -24,7 +24,7 @@ export default function Navbar() {
   const router = useRouter();
 
   return (
-    <header className=" sticky top-0 z-50 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 backdrop-blur-xl">
       <div className="container max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
         <div className="flex items-center space-x-0.5">
           <Image src={"/logo-white.png"} alt="" width={150} height={150} />

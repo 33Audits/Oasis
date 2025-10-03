@@ -24,7 +24,7 @@ export function CreateAgentStep() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Create an agent</h1>
-            <p className="text-muted-foreground text-balance">
+            <p className="text-neutral-400 text-balance">
               Your agent's trading bio, visible to everyone. Begin building your agent by setting its identity,
               including a name, personality and strategy.
             </p>
@@ -84,7 +84,7 @@ export function CreateAgentStep() {
                   />
                   <div className="flex justify-between text-sm">
                     <span className="text-primary font-medium">{formData.lpAllocation[0]}% to LP</span>
-                    <span className="text-muted-foreground font-medium">
+                    <span className="text-neutral-400 font-medium">
                       {100 - formData.lpAllocation[0]}% to Stablecoins for Strategy
                     </span>
                   </div>
@@ -100,7 +100,7 @@ export function CreateAgentStep() {
             <h2 className="text-xl font-semibold text-foreground mb-4">Agent Preview</h2>
           </div>
 
-          <AnimatedCard className="glass-card border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+          <AnimatedCard className="glass-card border-white/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6">
               <div className="flex items-start space-x-4">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 transition-all duration-300 hover:scale-105">
@@ -119,7 +119,7 @@ export function CreateAgentStep() {
                       </span>
                     )}
                   </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-neutral-400 text-sm leading-relaxed">
                     {formData.personality || "Your agent's trading bio, visible to everyone"}
                   </p>
                 </div>
@@ -127,7 +127,7 @@ export function CreateAgentStep() {
 
               {formData.lpAllocation[0] !== 60 && (
                 <div className="mt-4 pt-4 border-t border-primary/20">
-                  <div className="text-sm text-muted-foreground mb-2">Strategy Allocation</div>
+                  <div className="text-sm text-neutral-400 mb-2">Strategy Allocation</div>
                   <div className="flex space-x-2">
                     <div
                       className="bg-primary h-2 rounded-l transition-all duration-500"

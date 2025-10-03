@@ -56,10 +56,10 @@ export default function CreateAgentPage() {
                   onClick={() => setCurrentStep(step.id)}
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
                     currentStep === step.id
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary text-white"
                       : currentStep > step.id
                       ? "bg-primary/20 text-primary hover:bg-primary/30"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      : "bg-muted text-neutral-400 hover:bg-muted/80"
                   }`}
                 >
                   {step.id}
@@ -68,10 +68,10 @@ export default function CreateAgentPage() {
                   onClick={() => setCurrentStep(step.id)}
                   className={`font-medium transition-colors ${
                     currentStep === step.id
-                      ? "text-primary"
+                      ? "text-white"
                       : currentStep > step.id
                       ? "text-primary/80 hover:text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-neutral-400 hover:text-foreground"
                   }`}
                 >
                   {step.name}
@@ -114,14 +114,14 @@ export default function CreateAgentPage() {
             variant="outline"
             onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
             disabled={currentStep === 1}
-            className="border-border text-muted-foreground hover:bg-muted"
+            className="border-border text-neutral-400 hover:bg-muted"
           >
             Previous
           </Button>
           <Button
             onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
             disabled={currentStep === 4 || !canProceed(currentStep)}
-            className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-primary-foreground"
+            className={`bg-white text-black rounded-xl hover:bg-white/90 ${currentStep === 4 ? "hidden" : "block"}`}
           >
             {currentStep === 4 ? "Launch Agent" : "Next"}
           </Button>
