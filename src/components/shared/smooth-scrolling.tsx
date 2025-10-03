@@ -50,6 +50,17 @@ export default function SmoothScrolling({
     };
     (window as any).smoothScrollTo = scrollToElement;
 
+    // Handle hash fragment on page load
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+      if (hash && hash.startsWith("#")) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          scrollToElement(hash);
+        }, 100);
+      }
+    }
+
     return () => {
       delete (window as any).smoothScrollTo;
     };
