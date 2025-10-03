@@ -193,18 +193,19 @@ function AgentsTable() {
   return (
     <div className="max-w-7xl mx-auto w-full container my-10 space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
       <div className="flex flex-wrap gap-4 items-center justify-between mb-12">
-        <h2 className="text-5xl font-normal text-white">Agents</h2>
-        <div className="flex gap-3 flex-wrap">
+        <h2 className="text-3xl md:text-5xl font-normal text-white">Agents</h2>
+        <div className="flex gap-2 md:gap-3">
           <Input
             placeholder="Search agents, symbols, or tags..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="w-64 bg-neutral-800 border-neutral-600 text-white placeholder:text-neutral-400"
+            className="w-full md:w-64 bg-neutral-800 border-neutral-600 text-white placeholder:text-neutral-400"
           />
 
           <Link href="/create">
             <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-              Create Agent
+              <span className="sm:hidden">Create +</span>
+              <span className="hidden sm:inline">Create Agent</span>
             </Button>
           </Link>
         </div>
