@@ -48,15 +48,21 @@ export default function SmoothScrolling({
     const shouldDisable = disabled || document.querySelector('[data-disable-smooth-scroll]') !== null;
     if (shouldDisable) return;
 
-    // Custom scrollTo function
+    // Custom scrollTo function with dynamic offset for sticky navbar
     const scrollToElement = (target: string) => {
-      if (lenisRef.current) {
-        lenisRef.current.scrollTo(target, {
-          offset: -120,
-          duration: 1.5,
-          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        });
-      }
+      if (!lenisRef.current) return;
+
+      const header = document.querySelector("header.sticky") as HTMLElement | null;
+      const headerHeight = header ? header.offsetHeight : 0;
+      const isMobile = typeof window !== "undefined" ? window.innerWidth < 640 : false;
+      const extraPadding = isMobile ? 16 : 0;
+      const dynamicOffset = -(headerHeight + extraPadding);
+
+      lenisRef.current.scrollTo(target, {
+        offset: dynamicOffset,
+        duration: 1.5,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
     };
     (window as any).smoothScrollTo = scrollToElement;
 

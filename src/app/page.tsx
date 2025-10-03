@@ -9,7 +9,7 @@ export default function Home() {
       <Hero />
 
       {/* Agents Table Section */}
-      <section id="agents" className="py-28">
+      <section id="agents" className="py-12 md:py-28">
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-12">
             <h2 className="text-3xl md:text-5xl">Active Trading Agents</h2>

@@ -191,7 +191,7 @@ function AgentsTable() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto w-full container my-10 space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
+    <div className="max-w-7xl mx-auto w-full container space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
       <div className="flex flex-wrap gap-4 items-center justify-between mb-12">
         <h2 className="text-3xl md:text-5xl font-normal text-white">Agents</h2>
         <div className="flex gap-2 md:gap-3">
