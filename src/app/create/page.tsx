@@ -48,13 +48,13 @@ export default function CreateAgentPage() {
     <div className="min-h-screen bg-background">
       {/* Progress Steps */}
       <div className="bg-background border-b border-border">
-        <div className="container max-w-6xl  mx-auto px-4 py-4">
-          <div className="flex items-center space-x-4">
+        <div className="container max-w-6xl  mx-auto px-4 py-3 md:py-4">
+          <div className="flex items-center space-x-1 md:space-x-4">
             {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center space-x-2">
+              <div key={step.id} className="flex items-center md:space-x-2">
                 <button
                   onClick={() => setCurrentStep(step.id)}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
+                  className={`w-7 h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 rounded-full flex items-center justify-center text-xs md:text-sm lg:text-base font-semibold transition-all duration-300 ${
                     currentStep === step.id
                       ? "bg-primary text-white"
                       : currentStep > step.id
@@ -66,7 +66,7 @@ export default function CreateAgentPage() {
                 </button>
                 <button
                   onClick={() => setCurrentStep(step.id)}
-                  className={`font-medium transition-colors ${
+                  className={`font-light text-xs md:text-sm lg:text-base transition-colors ${
                     currentStep === step.id
                       ? "text-white"
                       : currentStep > step.id
@@ -77,7 +77,7 @@ export default function CreateAgentPage() {
                   {step.name}
                 </button>
                 {index < steps.length - 1 && (
-                  <div className="w-8 h-px bg-border"></div>
+                  <div className="w-6 md:w-8 lg:w-10 h-px bg-border"></div>
                 )}
               </div>
             ))}

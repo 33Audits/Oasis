@@ -14,5 +14,9 @@ export const privyConfig: PrivyClientConfig = {
   loginMethods: ["wallet", "email", "sms"],
   appearance: {
     showWalletLoginFirst: true,
+    theme: "#010101",
+    accentColor: "#3db9ff",
+    logo: "/logo-white.png",
+    
   },
 };

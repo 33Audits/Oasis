@@ -30,7 +30,7 @@ export default function ConnectWalletButton() {
         <WalletDisplay />
       ) : (
         <Button
-          className="rounded-xl bg-white hover:bg-white/90 text-black font-mono cursor-pointer"
+          className="rounded-xl bg-background border border-white/50 hover:bg-white/90 text-white hover:text-black font-mono cursor-pointer"
           onClick={handleLogin}
           disabled={isLoading}
         >

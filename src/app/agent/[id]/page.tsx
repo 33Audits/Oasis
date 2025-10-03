@@ -63,16 +63,16 @@ const agentData = {
 export default function AgentDashboard({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <div className="container max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
         {/* Agent Summary Section */}
         <AgentSummary agentData={agentData} />
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
           {/* Main Chart Panel */}
           <ChartPanel agentData={agentData} />
 
           {/* Right Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {/* Trading Panel */}
             <TradingPanel agentData={agentData} />
 

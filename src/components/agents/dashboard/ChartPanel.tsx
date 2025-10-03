@@ -178,7 +178,7 @@ export function ChartPanel({ agentData }: ChartPanelProps) {
           </div>
 
           {/* Chart Controls */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center md:gap-4">
             <div className="flex gap-2">
               {["24h", "1D", "5D", "1M"].map((timeframe) => (
                 <Button
@@ -200,7 +200,7 @@ export function ChartPanel({ agentData }: ChartPanelProps) {
               ))}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex">
               <Button
                 variant="ghost"
                 size="sm"
@@ -217,7 +217,7 @@ export function ChartPanel({ agentData }: ChartPanelProps) {
               </Button>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex">
               <Button
                 variant="ghost"
                 size="sm"
