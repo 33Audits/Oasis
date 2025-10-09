@@ -1,4 +1,4 @@
-import { useWriteContract } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 import { sepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
@@ -9,6 +9,12 @@ import { parseEventLogs } from "viem";
 export function useCreateBondingCurve() {
   const publicClient = usePublicClient();
   const [bcWorkflowAddress, setBcWorkflowAddress] = useState<`0x${string}` | null>(null);
+
+  const { data: minDepositAmount } = useReadContract({
+    address: contractAddress[sepolia.id].LM_Gaia_BC_Factory_v1,
+    abi: abis.LM_Gaia_BC_Factory_v1,
+    functionName: "minAmount"
+  });
 
   const { writeContractAsync, ...rest } = useWriteContract();
 
@@ -24,11 +30,22 @@ export function useCreateBondingCurve() {
       throw new Error("Public client not available");
     }
 
+    if (minDepositAmount && params.stakeAmount < minDepositAmount) {
+      throw new Error(`Stake amount must be greater than or equal to ${minDepositAmount}`);
+    }
+
     await writeContractAsync({
       address: contractAddress[sepolia.id].FakeGaiaToken,
       abi: abis.ERC20Mint,
       functionName: "approve",
       args: [contractAddress[sepolia.id].FM_ExpectingPayment_v1, params.stakeAmount],
+    });
+
+    await writeContractAsync({
+      address: contractAddress[sepolia.id].FM_ExpectingPayment_v1,
+      abi: abis.FM_ExpectingPayment_v1,
+      functionName: "deposit",
+      args: [params.stakeAmount],
     });
 
     const txid = await writeContractAsync({
@@ -58,7 +75,9 @@ export function useCreateBondingCurve() {
     if (bondingCurveEvent && "bcWorkflowAddress" in bondingCurveEvent.args) {
       setBcWorkflowAddress(bondingCurveEvent.args.bcWorkflowAddress);
     }
-  }, [writeContractAsync, publicClient]);
 
-  return { createBondingCurve, bcWorkflowAddress, ...rest };
+    return { txid, receipt };
+  }, [writeContractAsync, publicClient, minDepositAmount]);
+
+  return { createBondingCurve, bcWorkflowAddress, minDepositAmount, ...rest };
 }
