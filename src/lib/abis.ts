@@ -3021,12 +3021,12 @@ export const abis = {
     LM_Gaia_BC_Factory_v1: [
         {
             type: "function",
-            name: "bcWorkflowAddress",
+            name: "bcWorkflowAddressById",
             inputs: [
                 {
                     name: "",
-                    type: "address",
-                    internalType: "address"
+                    type: "uint256",
+                    internalType: "uint256"
                 }
             ],
             outputs: [
@@ -3034,6 +3034,19 @@ export const abis = {
                     name: "",
                     type: "address",
                     internalType: "address"
+                }
+            ],
+            stateMutability: "view"
+        },
+        {
+            type: "function",
+            name: "bcWorkflowCount",
+            inputs: [],
+            outputs: [
+                {
+                    name: "",
+                    type: "uint256",
+                    internalType: "uint256"
                 }
             ],
             stateMutability: "view"
@@ -3385,7 +3398,7 @@ export const abis = {
         },
         {
             type: "function",
-            name: "stakingConfirmation",
+            name: "stakingConfirmationCreditByOwner",
             inputs: [
                 {
                     name: "",
