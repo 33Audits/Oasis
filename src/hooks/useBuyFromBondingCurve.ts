@@ -3,10 +3,19 @@ import { sepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { useCallback } from "react";
+import { useWallets } from "@privy-io/react-auth";
 
 export function useBuyFromBondingCurve() {
   const publicClient = usePublicClient();
   const { writeContractAsync, ...rest } = useWriteContract();
+
+  const { wallets } = useWallets();
+
+  const activeWallet = wallets?.[0];
+
+  const walletChainId = activeWallet?.chainId
+    ? Number(activeWallet.chainId.split(':')[1])
+    : NaN;
 
   const buyFromBondingCurve = useCallback(async (params: {
     bcAddress: `0x${string}`,
@@ -16,6 +25,10 @@ export function useBuyFromBondingCurve() {
   }) => {
     if (!publicClient) {
       throw new Error("Public client not available");
+    }
+
+    if (walletChainId !== sepolia.id) {
+      throw new Error("Please switch to Sepolia to buy from a bonding curve");
     }
 
     await writeContractAsync({

@@ -1,47 +1,99 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { AnimatedCard } from "@/components/ui/animated-card"
-import { FadeIn } from "@/components/ui/fade-in"
-import { Rocket, DollarSign, Target, Clock } from "lucide-react"
-import { useAgentStore } from "@/lib/store"
+import { useState } from "react";
+import { CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { Rocket, DollarSign, Copy } from "lucide-react";
+import { useBondingCurveStore } from "@/lib/store";
+import { useCreateBondingCurve } from "@/hooks/useCreateBondingCurve";
+import { copyToClipboard } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function DeployStep() {
-  const { formData, updateFormData } = useAgentStore()
-  const [isDeploying, setIsDeploying] = useState(false)
-  const [deployProgress, setDeployProgress] = useState(0)
+  const { formData, updateFormData, resetForm } = useBondingCurveStore();
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployProgress, setDeployProgress] = useState(0);
 
-  const handleInputChange = (field: string, value: string | number) => {
-    updateFormData({ [field]: value })
-  }
+  const { createBondingCurve, minDepositAmount, bcWorkflowAddress, isPending } =
+    useCreateBondingCurve();
+
+  const handleInputChange = (field: string, value: string) => {
+    updateFormData({ [field]: value });
+  };
+
+  const handleCopyAddress = async () => {
+    if (bcWorkflowAddress) {
+      const success = await copyToClipboard(bcWorkflowAddress);
+      if (success) {
+        toast.success("Address Copied!", {
+          description: "Contract address copied to clipboard",
+        });
+      } else {
+        toast.error("Copy Failed", {
+          description: "Failed to copy address to clipboard",
+        });
+      }
+    }
+  };
 
   const handleDeploy = async () => {
-    setIsDeploying(true)
-    setDeployProgress(0)
+    try {
+      setIsDeploying(true);
+      setDeployProgress(0);
 
-    // Simulate deployment process
-    const steps = [
-      { name: "Creating smart contract", duration: 2000 },
-      { name: "Deploying to blockchain", duration: 3000 },
-      { name: "Setting up liquidity pool", duration: 2500 },
-      { name: "Initializing agent", duration: 1500 },
-      { name: "Finalizing deployment", duration: 1000 },
-    ]
+      setDeployProgress(25);
 
-    for (let i = 0; i < steps.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, steps[i].duration))
-      setDeployProgress((i + 1) * 20)
+      const params = {
+        vaultAddress: formData.vaultAddress as `0x${string}`,
+        feeVaultAddress: formData.feeVaultAddress as `0x${string}`,
+        threshold: BigInt(formData.threshold),
+        bcParams: {
+          reserveRatioForBuying: formData.reserveRatioForBuying,
+          reserveRatioForSelling: formData.reserveRatioForSelling,
+          initialIssuanceSupply: BigInt(formData.initialIssuanceSupply),
+          initialCollateralSupply: BigInt(formData.initialCollateralSupply),
+        },
+        issuanceTokenParams: {
+          name: formData.name,
+          symbol: formData.symbol,
+          decimals: formData.decimals,
+          maxSupply: BigInt(formData.maxSupply),
+        },
+        stakeAmount: BigInt(formData.stakeAmount),
+      };
+
+      setDeployProgress(50);
+
+      const result = await createBondingCurve(params);
+
+      setDeployProgress(100);
+
+      toast.success("Bonding Curve Deployed Successfully!", {
+        description: `Contract deployed on Sepolia${
+          bcWorkflowAddress ? ` at ${bcWorkflowAddress}` : ""
+        }`,
+      });
+      
+      resetForm();
+
+      console.log("Bonding curve created successfully:", result);
+    } catch (err) {
+      setDeployProgress(0);
+      setIsDeploying(false);
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create bonding curve";
+      toast.error("Deployment Failed", {
+        description: errorMessage,
+      });
+      console.error("Deployment failed:", err);
+    } finally {
+      setIsDeploying(false);
     }
-
-    setIsDeploying(false);
-  }
-
-  const estimatedCost = 0.05 + (parseFloat(formData.fundingGoal) || 0) * 0.001
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -49,85 +101,40 @@ export function DeployStep() {
         {/* Form Section */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Deploy Agent</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Deploy Bonding Curve
+            </h1>
             <p className="text-neutral-400 text-balance">
-              Set your launch parameters and deploy your AI trading agent to the blockchain.
+              Set your stake amount and deploy your bonding curve to the
+              blockchain.
             </p>
           </div>
 
           <AnimatedCard className="glass-card border-white/20">
-            <CardHeader>
-              <CardTitle className="text-foreground">Launch Parameters</CardTitle>
-              <CardDescription>Configure the initial settings for your agent launch</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-6 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="buyAmount" className="text-sm font-medium text-foreground">
-                  Initial Token Buy Amount (ETH)
+                <Label
+                  htmlFor="stakeAmount"
+                  className="text-sm font-medium text-foreground"
+                >
+                  Stake Amount (GAIA Tokens)
                 </Label>
                 <Input
-                  id="buyAmount"
-                  type="number"
-                  placeholder="0.1"
-                  step="0.01"
-                  min="0.01"
-                  value={formData.buyAmount || ""}
-                  onChange={(e) => handleInputChange("buyAmount", Number.parseFloat(e.target.value) || 0)}
+                  id="stakeAmount"
+                  placeholder="e.g. 1000000000000000000000"
+                  value={formData.stakeAmount}
+                  onChange={(e) =>
+                    handleInputChange("stakeAmount", e.target.value)
+                  }
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="fundingGoal" className="text-sm font-medium text-foreground">
-                  Funding Goal (ETH)
-                </Label>
-                <Input
-                  id="fundingGoal"
-                  type="number"
-                  placeholder="10"
-                  step="1"
-                  min="1"
-                  value={formData.fundingGoal || ""}
-                  onChange={(e) => handleInputChange("fundingGoal", Number.parseFloat(e.target.value) || 0)}
-                  className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="launchDelay" className="text-sm font-medium text-foreground">
-                  Launch Delay (hours)
-                </Label>
-                <Input
-                  id="launchDelay"
-                  type="number"
-                  placeholder="24"
-                  step="1"
-                  min="0"
-                  value={formData.launchDelay || ""}
-                  onChange={(e) => handleInputChange("launchDelay", Number.parseInt(e.target.value) || 0)}
-                  className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
-                />
-              </div>
-            </CardContent>
-          </AnimatedCard>
-
-          <AnimatedCard className="glass-card border-white/20">
-            <CardHeader>
-              <CardTitle className="text-foreground">Deployment Cost</CardTitle>
-              <CardDescription>Estimated costs for deploying your agent</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-neutral-400">Smart Contract Deployment</span>
-                <span className="text-foreground">0.05 ETH</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-neutral-400">Initial Liquidity</span>
-                <span className="text-foreground">{(parseFloat(formData.fundingGoal) || 0) * 0.001} ETH</span>
-              </div>
-              <div className="border-t border-border pt-2 flex justify-between font-medium">
-                <span className="text-foreground">Total Estimated Cost</span>
-                <span className="text-primary">{estimatedCost.toFixed(3)} ETH</span>
+                <p className="text-xs text-neutral-400">
+                  Minimum stake:{" "}
+                  {minDepositAmount
+                    ? minDepositAmount.toString()
+                    : "Loading..."}{" "}
+                  GAIA tokens
+                </p>
               </div>
             </CardContent>
           </AnimatedCard>
@@ -136,42 +143,62 @@ export function DeployStep() {
             <Button
               onClick={handleDeploy}
               className="w-full bg-white text-black rounded-xl hover:bg-white/90"
-              disabled={!formData.buyAmount || !formData.fundingGoal}
+              disabled={!formData.stakeAmount || isPending}
             >
               <Rocket className="mr-2 h-4 w-4" />
-              Deploy Agent
+              {isPending ? "Creating Bonding Curve..." : "Deploy Bonding Curve"}
             </Button>
           )}
 
-          {isDeploying && (
+          {(isDeploying || isPending) && (
             <AnimatedCard className="border-white/20">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
                     <Rocket className="h-5 w-5 text-primary animate-pulse" />
-                    <span className="text-foreground font-medium">Deploying Agent...</span>
+                    <span className="text-foreground font-medium">
+                      Deploying Bonding Curve...
+                    </span>
                   </div>
                   <Progress value={deployProgress} className="w-full" />
                   <p className="text-sm text-neutral-400">
-                    {deployProgress < 20 && "Creating smart contract..."}
-                    {deployProgress >= 20 && deployProgress < 40 && "Deploying to blockchain..."}
-                    {deployProgress >= 40 && deployProgress < 60 && "Setting up liquidity pool..."}
-                    {deployProgress >= 60 && deployProgress < 80 && "Initializing agent..."}
-                    {deployProgress >= 80 && "Finalizing deployment..."}
+                    {deployProgress < 25 && "Preparing parameters..."}
+                    {deployProgress >= 25 &&
+                      deployProgress < 50 &&
+                      "Approving tokens..."}
+                    {deployProgress >= 50 &&
+                      deployProgress < 100 &&
+                      "Creating bonding curve..."}
+                    {deployProgress >= 100 && "Finalizing deployment..."}
                   </p>
                 </div>
               </CardContent>
             </AnimatedCard>
           )}
 
-          {deployProgress === 100 && (
+          {deployProgress === 100 && bcWorkflowAddress && (
             <AnimatedCard className="border-green-500/20 bg-green-500/5">
               <CardContent className="p-6 text-center">
                 <div className="space-y-2">
-                  <div className="text-green-500 font-semibold">🎉 Agent Deployed Successfully!</div>
+                  <div className="text-green-500 font-semibold">
+                    🎉 Bonding Curve Deployed Successfully!
+                  </div>
                   <p className="text-sm text-neutral-400">
-                    Your AI trading agent is now live and ready to start trading.
+                    Your bonding curve is now live on Sepolia testnet.
                   </p>
+                  <div className="flex items-center justify-center space-x-2 mt-2">
+                    <p className="text-xs text-neutral-500 font-mono">
+                      Contract: {bcWorkflowAddress}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyAddress}
+                      className="h-6 w-6 p-0 hover:bg-neutral-700"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </AnimatedCard>
@@ -181,32 +208,70 @@ export function DeployStep() {
         {/* Preview Section */}
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-foreground mb-4">Launch Summary</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">
+              Deployment Summary
+            </h2>
           </div>
 
           <AnimatedCard className="glass-card border-white/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="p-6 space-y-4">
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Token Parameters
+                </h3>
+                <div className="space-y-1 text-sm">
+                  <p className="text-neutral-400">
+                    Name:{" "}
+                    <span className="text-primary font-medium">
+                      {formData.name || "Not set"}
+                    </span>
+                  </p>
+                  <p className="text-neutral-400">
+                    Symbol:{" "}
+                    <span className="text-primary font-medium">
+                      {formData.symbol || "Not set"}
+                    </span>
+                  </p>
+                  <p className="text-neutral-400">
+                    Max Supply:{" "}
+                    <span className="text-primary font-medium">
+                      {formData.maxSupply || "Not set"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Bonding Curve Config
+                </h3>
+                <div className="space-y-1 text-sm">
+                  <p className="text-neutral-400">
+                    Buy Ratio:{" "}
+                    <span className="text-primary font-medium">
+                      {formData.reserveRatioForBuying}%
+                    </span>
+                  </p>
+                  <p className="text-neutral-400">
+                    Sell Ratio:{" "}
+                    <span className="text-primary font-medium">
+                      {formData.reserveRatioForSelling}%
+                    </span>
+                  </p>
+                </div>
+              </div>
+
               <div className="flex items-center space-x-3">
                 <DollarSign className="h-5 w-5 text-primary" />
                 <div>
-                  <h3 className="font-semibold text-foreground">Initial Investment</h3>
-                  <p className="text-neutral-400 text-sm">{formData.buyAmount || 0} ETH token purchase</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Target className="h-5 w-5 text-primary" />
-                <div>
-                  <h3 className="font-semibold text-foreground">Funding Goal</h3>
-                  <p className="text-neutral-400 text-sm">{formData.fundingGoal || "0"} ETH target</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Clock className="h-5 w-5 text-primary" />
-                <div>
-                  <h3 className="font-semibold text-foreground">Launch Timing</h3>
-                  <p className="text-neutral-400 text-sm">{formData.launchDelay || 0} hours delay</p>
+                  <h3 className="font-semibold text-foreground">
+                    Stake Amount
+                  </h3>
+                  <p className="text-neutral-400 text-sm">
+                    {formData.stakeAmount
+                      ? `${formData.stakeAmount} GAIA tokens`
+                      : "Not set"}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -214,5 +279,5 @@ export function DeployStep() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -5,10 +5,19 @@ import { abis } from "@/lib/abis";
 import { useCallback, useState } from "react";
 import { usePublicClient } from "wagmi";
 import { parseEventLogs } from "viem";
+import { useWallets } from "@privy-io/react-auth";
 
 export function useCreateBondingCurve() {
   const publicClient = usePublicClient();
   const [bcWorkflowAddress, setBcWorkflowAddress] = useState<`0x${string}` | null>(null);
+
+  const { wallets } = useWallets();
+
+  const activeWallet = wallets?.[0];
+
+  const walletChainId = activeWallet?.chainId
+    ? Number(activeWallet.chainId.split(':')[1])
+    : NaN;
 
   const { data: minDepositAmount } = useReadContract({
     address: contractAddress[sepolia.id].LM_Gaia_BC_Factory_v1,
@@ -28,6 +37,10 @@ export function useCreateBondingCurve() {
   }) => {
     if (!publicClient) {
       throw new Error("Public client not available");
+    }
+
+    if (walletChainId !== sepolia.id) {
+      throw new Error("Please switch to Sepolia to create a bonding curve");
     }
 
     if (minDepositAmount && params.stakeAmount < minDepositAmount) {

@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "@/providers/PrivyProvider";
 import Navbar from "@/components/shared/navbar";
 import SmoothScrolling from "@/components/shared/smooth-scrolling";
+import { Toaster } from "@/components/ui/sonner";
 
 const styreneA = localFont({
   src: [
@@ -51,6 +52,7 @@ export default function RootLayout({
             <Navbar />
             {children}
           </SmoothScrolling>
+          <Toaster richColors />
         </Providers>
       </body>
     </html>

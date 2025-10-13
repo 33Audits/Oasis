@@ -1,97 +1,59 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-export interface AgentFormData {
-  // Step 1: Agent Creation
+export interface BondingCurveFormData {
+  // Step 1: Token Parameters
   name: string
-  ticker: string
-  personality: string
-  lpAllocation: number[]
+  symbol: string
+  decimals: number
+  maxSupply: string
 
-  // Step 2: Strategy Configuration
-  riskAppetite: string
-  selectedAssets: string[]
-  selectedTools: string[]
-  selectedProtocols: string[]
-  strategy: string
-  assetTypes: string[]
-  mcpTools: string[]
+  // Step 2: Bonding Curve Parameters
+  reserveRatioForBuying: number
+  reserveRatioForSelling: number
+  initialIssuanceSupply: string
+  initialCollateralSupply: string
 
-  // Step 2b: Advanced Parameters
-  baseStrategy: string
-  parameters: {
-    watching: string
-    rsiPeriod: string
-    rsiThresholds: string
-    slTp: string
-  }
-  connectedServers: string[]
-
-  // Step 3: Vault Policies
-  profitSplit: string
-  customSplit: number[]
-  distributionToken: string
-  distributionMethod: string
-  vaultAccess: string
-  performanceFee: number[]
+  // Step 3: Vault Configuration
+  vaultAddress: string
+  feeVaultAddress: string
+  threshold: string
 
   // Step 4: Deployment
-  initialBuy: string
-  fundingGoal: string
-  buyAmount: number
-  launchDelay: number
+  stakeAmount: string
 }
 
-interface AgentStore {
-  formData: AgentFormData
+interface BondingCurveStore {
+  formData: BondingCurveFormData
   currentStep: number
-  updateFormData: (data: Partial<AgentFormData>) => void
+  updateFormData: (data: Partial<BondingCurveFormData>) => void
   setCurrentStep: (step: number) => void
   resetForm: () => void
 }
 
-const initialFormData: AgentFormData = {
-  // Step 1
+const initialFormData: BondingCurveFormData = {
+  // Step 1: Token Parameters
   name: "",
-  ticker: "",
-  personality: "",
-  lpAllocation: [60],
+  symbol: "",
+  decimals: 18,
+  maxSupply: "",
 
-  // Step 2
-  riskAppetite: "Middle",
-  selectedAssets: ["altcoins"],
-  selectedTools: ["Trendmoon", "Allora"],
-  selectedProtocols: ["Ethereum", "Aave"],
-  strategy: "",
-  assetTypes: ["altcoins"],
-  mcpTools: ["Trendmoon", "Allora"],
+  // Step 2: Bonding Curve Parameters
+  reserveRatioForBuying: 50,
+  reserveRatioForSelling: 50,
+  initialIssuanceSupply: "",
+  initialCollateralSupply: "",
 
-  // Step 2b
-  baseStrategy: "momentum scalper",
-  parameters: {
-    watching: "ETH/USDC",
-    rsiPeriod: "14",
-    rsiThresholds: "70 / 30",
-    slTp: "5% / 10%",
-  },
-  connectedServers: ["Ethereum", "Aave", "Euler"],
+  // Step 3: Vault Configuration
+  vaultAddress: "",
+  feeVaultAddress: "",
+  threshold: "",
 
-  // Step 3
-  profitSplit: "55-45",
-  customSplit: [70],
-  distributionToken: "agent",
-  distributionMethod: "automatic",
-  vaultAccess: "locked",
-  performanceFee: [15],
-
-  // Step 4
-  initialBuy: "0.005",
-  fundingGoal: "10",
-  buyAmount: 0.005,
-  launchDelay: 0,
+  // Step 4: Deployment
+  stakeAmount: "",
 }
 
-export const useAgentStore = create<AgentStore>()(
+export const useBondingCurveStore = create<BondingCurveStore>()(
   persist(
     (set) => ({
       formData: initialFormData,
@@ -104,7 +66,7 @@ export const useAgentStore = create<AgentStore>()(
       resetForm: () => set({ formData: initialFormData, currentStep: 1 }),
     }),
     {
-      name: "agent-launchpad-storage",
+      name: "bonding-curve-launchpad-storage",
     },
   ),
 )

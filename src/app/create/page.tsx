@@ -3,42 +3,39 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useAgentStore } from "@/lib/store";
-import { CreateAgentStep } from "@/components/steps/create-agent-step";
-import { StrategyStep } from "@/components/steps/strategy-step";
-import { VaultStep } from "@/components/steps/vault-step";
+import { useBondingCurveStore } from "@/lib/store";
+import { TokenParametersStep } from "@/components/steps/token-parameters-step";
+import { BondingCurveStep } from "@/components/steps/bonding-curve-step";
+import { VaultConfigStep } from "@/components/steps/vault-config-step";
 import { DeployStep } from "@/components/steps/deploy-step";
-import Image from "next/image";
-import { X } from "lucide-react";
 
 const steps = [
-  { id: 1, name: "Create Agent", component: CreateAgentStep },
-  { id: 2, name: "Strategy", component: StrategyStep },
-  { id: 3, name: "Vault", component: VaultStep },
+  { id: 1, name: "Token Parameters", component: TokenParametersStep },
+  { id: 2, name: "Bonding Curve", component: BondingCurveStep },
+  { id: 3, name: "Vault Config", component: VaultConfigStep },
   { id: 4, name: "Deploy", component: DeployStep },
 ];
 
-export default function CreateAgentPage() {
+export default function CreateBondingCurvePage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const { formData } = useAgentStore();
+  const { formData } = useBondingCurveStore();
 
   const CurrentStepComponent =
-    steps.find((step) => step.id === currentStep)?.component || CreateAgentStep;
+    steps.find((step) => step.id === currentStep)?.component || TokenParametersStep;
 
   const canProceed = (step: number) => {
     switch (step) {
       case 1:
-        return formData.name && formData.ticker;
+        return formData.name && formData.symbol && formData.maxSupply;
       case 2:
         return (
-          formData.riskAppetite &&
-          formData.selectedAssets &&
-          formData.selectedAssets.length > 0
+          formData.initialIssuanceSupply &&
+          formData.initialCollateralSupply
         );
       case 3:
-        return formData.profitSplit && formData.distributionToken;
+        return formData.vaultAddress && formData.feeVaultAddress && formData.threshold;
       case 4:
-        return true;
+        return formData.stakeAmount;
       default:
         return false;
     }
@@ -123,7 +120,7 @@ export default function CreateAgentPage() {
             disabled={currentStep === 4 || !canProceed(currentStep)}
             className={`bg-white text-black rounded-xl hover:bg-white/90 ${currentStep === 4 ? "hidden" : "block"}`}
           >
-            {currentStep === 4 ? "Launch Agent" : "Next"}
+            {currentStep === 4 ? "Create Bonding Curve" : "Next"}
           </Button>
         </div>
       </div>
