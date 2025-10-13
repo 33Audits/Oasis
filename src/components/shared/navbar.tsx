@@ -7,6 +7,7 @@ import ConnectWalletButton from "../wallet/connect-wallet-button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "../ui/button";
+import { usePrivy } from "@privy-io/react-auth";
 
 const handleNavigation = (
   target: string,
@@ -16,12 +17,10 @@ const handleNavigation = (
   const isHomePage = pathname === "/";
 
   if (isHomePage) {
-    // On home page, use smooth scroll
     if (typeof window !== "undefined" && (window as any).smoothScrollTo) {
       (window as any).smoothScrollTo(target);
     }
   } else {
-    // Not on home page, redirect to home page with hash
     router.push(`/${target}`);
   }
 };
@@ -30,6 +29,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  const { authenticated: isAuthenticated } = usePrivy();
 
   return (
     <header className="sticky top-0 z-50 bg-transparent backdrop-blur-xl">
@@ -63,11 +64,13 @@ export default function Navbar() {
 
           {/* Desktop wallet button */}
           <div className="flex items-center space-x-2">
+            {isAuthenticated && (
             <Link href="/create" className="hidden md:block">
               <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
                 Create Agent
               </Button>
             </Link>
+            )}
 
             <ConnectWalletButton />
 
@@ -125,13 +128,15 @@ export default function Navbar() {
               </button>
             </div>
 
-            <div className="p-4">
-            <Link href="/create">
-              <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-                Create Agent
-              </Button>
-            </Link>
-            </div>
+            {isAuthenticated && (
+              <div className="p-4">
+                <Link href="/create">
+                  <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
+                    Create Agent
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>

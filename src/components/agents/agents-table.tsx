@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { usePrivy } from "@privy-io/react-auth";
 
 type Agent = {
   id: string;
@@ -171,6 +172,7 @@ function AgentsTable() {
   const [searchFilter, setSearchFilter] = useState("");
 
   const router = useRouter();
+  const { authenticated: isAuthenticated } = usePrivy();
 
   const filteredData = data.filter((agent) => {
     if (!searchFilter) return true;
@@ -201,13 +203,14 @@ function AgentsTable() {
             onChange={(e) => setSearchFilter(e.target.value)}
             className="w-full md:w-64 bg-neutral-800 border-neutral-600 text-white placeholder:text-neutral-400"
           />
-
+          {isAuthenticated && (
           <Link href="/create">
             <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
               <span className="sm:hidden">Create +</span>
               <span className="hidden sm:inline">Create Agent</span>
             </Button>
           </Link>
+          )}
         </div>
       </div>
 
