@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useBondingCurveStore } from "@/lib/store";
 import { TokenParametersStep } from "@/components/steps/token-parameters-step";
 import { BondingCurveStep } from "@/components/steps/bonding-curve-step";
-import { VaultConfigStep } from "@/components/steps/vault-config-step";
 import { DeployStep } from "@/components/steps/deploy-step";
 
 const steps = [
