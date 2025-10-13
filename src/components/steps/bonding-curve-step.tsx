@@ -6,12 +6,24 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { AnimatedCard } from "@/components/ui/animated-card"
 import { useBondingCurveStore } from "@/lib/store"
+import { parseEther } from "viem"
+import { formatTokenAmount } from "@/lib/utils"
 
 export function BondingCurveStep() {
   const { formData, updateFormData } = useBondingCurveStore()
 
   const handleInputChange = (field: string, value: string | number[]) => {
-    updateFormData({ [field]: value })
+    if (field === "initialIssuanceSupply" || field === "initialCollateralSupply") {
+      const stringValue = Array.isArray(value) ? value[0]?.toString() : value;
+      try {
+        const weiValue = parseEther(stringValue || "0");
+        updateFormData({ [field]: weiValue.toString() });
+      } catch (error) {
+        console.warn(`Invalid ${field}:`, value);
+      }
+    } else {
+      updateFormData({ [field]: value });
+    }
   }
 
   return (
@@ -70,12 +82,12 @@ export function BondingCurveStep() {
                 </Label>
                 <Input
                   id="initialIssuanceSupply"
-                  placeholder="e.g. 1000000000000000000000"
-                  value={formData.initialIssuanceSupply}
+                  placeholder="e.g. 1000000"
+                  value={formatTokenAmount(formData.initialIssuanceSupply)}
                   onChange={(e) => handleInputChange("initialIssuanceSupply", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
-                <p className="text-xs text-neutral-400">Initial supply of tokens available for trading</p>
+                <p className="text-xs text-neutral-400">Initial supply of tokens available for trading (automatically converted to 18 decimals)</p>
               </div>
 
               <div className="space-y-2">
@@ -84,12 +96,12 @@ export function BondingCurveStep() {
                 </Label>
                 <Input
                   id="initialCollateralSupply"
-                  placeholder="e.g. 1000000000000000000000"
-                  value={formData.initialCollateralSupply}
+                  placeholder="e.g. 1000000"
+                  value={formatTokenAmount(formData.initialCollateralSupply)}
                   onChange={(e) => handleInputChange("initialCollateralSupply", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
-                <p className="text-xs text-neutral-400">Initial collateral backing the bonding curve</p>
+                <p className="text-xs text-neutral-400">Initial collateral backing the bonding curve (automatically converted to 18 decimals)</p>
               </div>
             </CardContent>
           </AnimatedCard>
@@ -120,12 +132,12 @@ export function BondingCurveStep() {
                 <div className="space-y-2 text-sm">
                   <p className="text-neutral-400">
                     Issuance Supply: <span className="text-primary font-medium">
-                      {formData.initialIssuanceSupply || "Not set"}
+                      {formData.initialIssuanceSupply ? formatTokenAmount(formData.initialIssuanceSupply) : "Not set"}
                     </span>
                   </p>
                   <p className="text-neutral-400">
                     Collateral Supply: <span className="text-primary font-medium">
-                      {formData.initialCollateralSupply || "Not set"}
+                      {formData.initialCollateralSupply ? formatTokenAmount(formData.initialCollateralSupply) : "Not set"}
                     </span>
                   </p>
                 </div>

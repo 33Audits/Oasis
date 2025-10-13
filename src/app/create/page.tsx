@@ -12,8 +12,7 @@ import { DeployStep } from "@/components/steps/deploy-step";
 const steps = [
   { id: 1, name: "Token Parameters", component: TokenParametersStep },
   { id: 2, name: "Bonding Curve", component: BondingCurveStep },
-  { id: 3, name: "Vault Config", component: VaultConfigStep },
-  { id: 4, name: "Deploy", component: DeployStep },
+  { id: 3, name: "Deploy", component: DeployStep },
 ];
 
 export default function CreateBondingCurvePage() {

@@ -10,8 +10,9 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { Rocket, DollarSign, Copy } from "lucide-react";
 import { useBondingCurveStore } from "@/lib/store";
 import { useCreateBondingCurve } from "@/hooks/useCreateBondingCurve";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard, formatTokenAmount } from "@/lib/utils";
 import { toast } from "sonner";
+import { parseEther } from "viem";
 
 export function DeployStep() {
   const { formData, updateFormData, resetForm } = useBondingCurveStore();
@@ -22,7 +23,16 @@ export function DeployStep() {
     useCreateBondingCurve();
 
   const handleInputChange = (field: string, value: string) => {
-    updateFormData({ [field]: value });
+    if (field === "stakeAmount") {
+      try {
+        const weiValue = parseEther(value || "0");
+        updateFormData({ [field]: weiValue.toString() });
+      } catch (error) {
+        console.warn("Invalid stake amount:", value);
+      }
+    } else {
+      updateFormData({ [field]: value });
+    }
   };
 
   const handleCopyAddress = async () => {
@@ -48,8 +58,8 @@ export function DeployStep() {
       setDeployProgress(25);
 
       const params = {
-        vaultAddress: formData.vaultAddress as `0x${string}`,
-        feeVaultAddress: formData.feeVaultAddress as `0x${string}`,
+        vaultAddress: "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
+        feeVaultAddress: "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
         threshold: BigInt(formData.threshold),
         bcParams: {
           reserveRatioForBuying: formData.reserveRatioForBuying,
@@ -121,8 +131,8 @@ export function DeployStep() {
                 </Label>
                 <Input
                   id="stakeAmount"
-                  placeholder="e.g. 1000000000000000000000"
-                  value={formData.stakeAmount}
+                  placeholder="e.g. 100"
+                  value={formatTokenAmount(formData.stakeAmount)}
                   onChange={(e) =>
                     handleInputChange("stakeAmount", e.target.value)
                   }
@@ -131,7 +141,7 @@ export function DeployStep() {
                 <p className="text-xs text-neutral-400">
                   Minimum stake:{" "}
                   {minDepositAmount
-                    ? minDepositAmount.toString()
+                    ? formatTokenAmount(minDepositAmount.toString())
                     : "Loading..."}{" "}
                   GAIA tokens
                 </p>
@@ -235,7 +245,7 @@ export function DeployStep() {
                   <p className="text-neutral-400">
                     Max Supply:{" "}
                     <span className="text-primary font-medium">
-                      {formData.maxSupply || "Not set"}
+                      { formatTokenAmount(formData.maxSupply) || "Not set"}
                     </span>
                   </p>
                 </div>
@@ -269,7 +279,7 @@ export function DeployStep() {
                   </h3>
                   <p className="text-neutral-400 text-sm">
                     {formData.stakeAmount
-                      ? `${formData.stakeAmount} GAIA tokens`
+                      ? `${formatTokenAmount(formData.stakeAmount)} GAIA tokens`
                       : "Not set"}
                   </p>
                 </div>
