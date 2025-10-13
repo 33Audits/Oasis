@@ -3409,8 +3409,8 @@ export const abis = {
             outputs: [
                 {
                     name: "",
-                    type: "bool",
-                    internalType: "bool"
+                    type: "uint8",
+                    internalType: "uint8"
                 }
             ],
             stateMutability: "view"
@@ -3492,6 +3492,25 @@ export const abis = {
                     name: "",
                     type: "uint256",
                     internalType: "uint256"
+                }
+            ],
+            stateMutability: "view"
+        },
+        {
+            type: "function",
+            name: "workflowCountByOwner",
+            inputs: [
+                {
+                    name: "",
+                    type: "address",
+                    internalType: "address"
+                }
+            ],
+            outputs: [
+                {
+                    name: "",
+                    type: "uint8",
+                    internalType: "uint8"
                 }
             ],
             stateMutability: "view"
