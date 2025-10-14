@@ -27,9 +27,9 @@ export function useBuyFromBondingCurve() {
       throw new Error("Public client not available");
     }
 
-    if (walletChainId !== sepolia.id) {
-      throw new Error("Please switch to Sepolia to buy from a bonding curve");
-    }
+    // if (walletChainId !== sepolia.id) {
+    //   throw new Error("Please switch to Sepolia to buy from a bonding curve");
+    // }
 
     await writeContractAsync({
       address: contractAddress[sepolia.id].FakeGaiaToken,
@@ -43,6 +43,7 @@ export function useBuyFromBondingCurve() {
       abi: abis.FM_BC_Bancor_Gaia_v1,
       functionName: "buyFor",
       args: [params.receiver, params.depositAmount, params.minAmountOut],
+      gas: BigInt(2100000),
     });
 
     const receipt = await publicClient.waitForTransactionReceipt({

@@ -1,23 +1,24 @@
 "use client";
 
+import React from "react";
 import {
   AgentSummary,
   ChartPanel,
   TradingPanel,
   TradingPersonality,
-  PoliciesWallet,
   TopHolders,
 } from "@/components/agents/dashboard";
+import { useTokenDetails } from "@/hooks/useTokenDetails";
 
-// Mock data for the agent
-const agentData = {
-  id: "567",
-  name: "AGENT",
-  symbol: "AGENT",
+// Mock data for the agent (keeping dummy marketCap and other data)
+const getAgentData = (id: string, tokenName?: string, tokenSymbol?: string, tokenAddress?: string) => ({
+  id,
+  name: tokenName || "AGENT",
+  symbol: tokenSymbol || "AGENT",
   avatar: "/33labs.jpg",
-  tokenAddress: "0x13...AuB9",
+  tokenAddress: tokenAddress || "0x13...AuB9",
   tags: ["DEXs", "Altcoins", "Meme"],
-  marketCap: "$3.5M",
+  marketCap: "$3.5M", // Keep dummy marketCap data
   change1d: "+47.25%",
   holders: "4,206",
   aum: "$40M",
@@ -58,9 +59,20 @@ const agentData = {
     { rank: 4, address: "0x...bb92", type: "liq. pool", percentage: "7.3%" },
     { rank: 5, address: "0x...cc03", type: "liq. pool", percentage: "7.3%" },
   ],
-};
+});
 
-export default function AgentDashboard({ params }: { params: { id: string } }) {
+export default function AgentDashboard({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = React.use(params);
+
+  const { data: tokenDetails } = useTokenDetails(resolvedParams.id as `0x${string}`);
+
+  const agentData = getAgentData(
+    resolvedParams.id,
+    tokenDetails?.name,
+    tokenDetails?.symbol,
+    tokenDetails?.address ? tokenDetails.address : undefined
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
@@ -74,7 +86,7 @@ export default function AgentDashboard({ params }: { params: { id: string } }) {
           {/* Right Sidebar */}
           <div className="space-y-4 md:space-y-6">
             {/* Trading Panel */}
-            <TradingPanel agentData={agentData} />
+            <TradingPanel agentData={agentData} bondingCurveAddress={resolvedParams.id as `0x${string}`} issuanceToken={tokenDetails?.address as `0x${string}`} />
 
             {/* Trading Personality */}
             <TradingPersonality tradingPersonality={agentData.tradingPersonality} />

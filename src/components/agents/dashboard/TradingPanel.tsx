@@ -7,26 +7,138 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { useBuyFromBondingCurve } from "@/hooks/useBuyFromBondingCurve";
+import { useReadContract } from "wagmi";
+import { abis } from "@/lib/abis";
+import { parseEther, formatEther } from "viem";
+import { useAccount } from "wagmi";
+import { useWallets } from "@privy-io/react-auth";
+import { toast } from "sonner";
+import { useSellFromBondingCurve } from "@/hooks/useSellFromBondingCurve";
 
 interface TradingPanelProps {
   agentData: {
     symbol: string;
     bondingCurveProgress: number;
   };
+  bondingCurveAddress?: `0x${string}`;
+  issuanceToken?: `0x${string}`;
 }
 
-export function TradingPanel({ agentData }: TradingPanelProps) {
+export function TradingPanel({
+  agentData,
+  bondingCurveAddress,
+  issuanceToken,
+}: TradingPanelProps) {
   const [tradeTab, setTradeTab] = useState("SELL");
-  const [buyAmount, setBuyAmount] = useState("1");
-  const [sellAmount, setSellAmount] = useState("10");
+  const [buyAmount, setBuyAmount] = useState("0");
+  const [sellAmount, setSellAmount] = useState("0");
+  const [isBuying, setIsBuying] = useState(false);
+  const [isSelling, setIsSelling] = useState(false);
+
+  const { address } = useAccount();
+  const { buyFromBondingCurve, isPending: isBuyingPending } =
+    useBuyFromBondingCurve();
+  const { sellFromBondingCurve, isPending: isSellingPending } =
+    useSellFromBondingCurve();
+
+  const { data: purchaseReturn } = useReadContract({
+    address: bondingCurveAddress,
+    abi: abis.FM_BC_Bancor_Gaia_v1,
+    functionName: "calculatePurchaseReturn",
+    args: buyAmount ? [parseEther(buyAmount)] : undefined,
+    query: {
+      enabled:
+        !!bondingCurveAddress && !!buyAmount && !isNaN(Number(buyAmount)),
+    },
+  });
+
+  const { data: saleReturn } = useReadContract({
+    address: bondingCurveAddress,
+    abi: abis.FM_BC_Bancor_Gaia_v1,
+    functionName: "calculateSaleReturn",
+    args: sellAmount ? [parseEther(sellAmount)] : undefined,
+    query: {
+      enabled:
+        !!bondingCurveAddress && !!sellAmount && !isNaN(Number(sellAmount)),
+    },
+  });
+
+  const handleBuy = async () => {
+    if (!bondingCurveAddress || !address || !purchaseReturn) {
+      toast.error("Missing required data for purchase");
+      return;
+    }
+
+    try {
+      setIsBuying(true);
+      const minAmountOut = (purchaseReturn * BigInt(98)) / BigInt(100);
+
+      const result = await buyFromBondingCurve({
+        bcAddress: bondingCurveAddress,
+        receiver: address,
+        depositAmount: parseEther(buyAmount),
+        minAmountOut,
+      });
+
+      toast.success(
+        `Successfully bought tokens! Transaction: ${result.txid.slice(
+          0,
+          10
+        )}...`
+      );
+
+      // Reset buy amount to default
+      setBuyAmount("1");
+    } catch (error: any) {
+      console.error("Buy transaction failed:", error);
+      toast.error(error.message || "Buy transaction failed");
+    } finally {
+      setIsBuying(false);
+    }
+  };
+
+  const handleSell = async () => {
+    if (!bondingCurveAddress || !address || !sellAmount) {
+      toast.error("Missing required data for sell");
+      return;
+    }
+
+    try {
+      setIsSelling(true);
+      const minAmountOut =
+        (saleReturn ? saleReturn * BigInt(98) : BigInt(0)) / BigInt(100);
+
+      const result = await sellFromBondingCurve({
+        bcAddress: bondingCurveAddress,
+        receiver: address,
+        depositAmount: parseEther(sellAmount),
+        minAmountOut,
+        tokenAddress: issuanceToken!,
+      });
+
+      toast.success(
+        `Successfully sold tokens! Transaction: ${result.txid.slice(0, 10)}...`
+      );
+    } catch (error: any) {
+      console.error("Sell transaction failed:", error);
+      toast.error(error.message || "Sell transaction failed");
+    } finally {
+      setIsSelling(false);
+    }
+  };
 
   return (
     <Card className="bg-card border-border shadow-lg">
       <CardContent className="p-0">
         {/* Trading Interface Header */}
         <div className="p-4 md:p-6 pb-4 border-b border-border">
-          <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">Trade {agentData.symbol}</h3>
-          <p className="text-xs md:text-sm text-neutral-400">Execute buy and sell orders</p>
+          <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">
+            Trade {agentData.symbol}
+          </h3>
+          <p className="text-xs md:text-sm text-neutral-400">
+            Execute buy and sell orders
+          </p>
         </div>
 
         <Tabs value={tradeTab} onValueChange={setTradeTab} className="w-full">
@@ -50,7 +162,10 @@ export function TradingPanel({ agentData }: TradingPanelProps) {
           </div>
 
           {/* BUY tab */}
-          <TabsContent value="BUY" className="px-4 md:px-6 pb-4 md:pb-6 space-y-3 md:space-y-4 mt-4 md:mt-6">
+          <TabsContent
+            value="BUY"
+            className="px-4 md:px-6 pb-4 md:pb-6 space-y-3 md:space-y-4 mt-4 md:mt-6"
+          >
             <div className="space-y-3">
               <div className="relative">
                 <Input
@@ -65,7 +180,13 @@ export function TradingPanel({ agentData }: TradingPanelProps) {
               </div>
 
               <div className="text-xs md:text-sm text-neutral-400 text-center">
-                ≈ $3,420.00 USD
+                ≈ ${agentData.symbol}{" "}
+                {purchaseReturn
+                  ? Number(formatEther(purchaseReturn)).toLocaleString(
+                      undefined,
+                      { maximumFractionDigits: 2 }
+                    )
+                  : "0"}
               </div>
 
               <div className="grid grid-cols-3 gap-2">
@@ -86,24 +207,45 @@ export function TradingPanel({ agentData }: TradingPanelProps) {
                 <div className="text-xs md:text-sm text-green-800">
                   <div className="flex justify-between items-center">
                     <span>You will receive:</span>
-                    <span className="font-semibold">≈ 1,234 {agentData.symbol}</span>
+                    <span className="font-semibold">
+                      ≈{" "}
+                      {purchaseReturn
+                        ? Number(formatEther(purchaseReturn)).toLocaleString(
+                            undefined,
+                            { maximumFractionDigits: 2 }
+                          )
+                        : "0"}{" "}
+                      {agentData.symbol}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center mt-1">
                     <span>Est. slippage:</span>
-                    <span className="font-semibold text-green-600">0.2%</span>
+                    <span className="font-semibold text-green-600">2%</span>
                   </div>
                 </div>
               </div>
 
-              <Button className="w-full h-10 md:h-12 bg-green-600 hover:bg-green-700 text-white font-medium text-sm md:text-base">
+              <Button
+                className="w-full h-10 md:h-12 bg-green-600 hover:bg-green-700 text-white font-medium text-sm md:text-base"
+                onClick={handleBuy}
+                disabled={
+                  isBuying ||
+                  isBuyingPending ||
+                  !bondingCurveAddress ||
+                  !purchaseReturn
+                }
+              >
                 <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-                PLACE BUY ORDER
+                {isBuying ? "BUYING..." : "PLACE BUY ORDER"}
               </Button>
             </div>
           </TabsContent>
 
           {/* SELL tab */}
-          <TabsContent value="SELL" className="px-4 md:px-6 pb-4 md:pb-6 space-y-3 md:space-y-4 mt-4 md:mt-6">
+          <TabsContent
+            value="SELL"
+            className="px-4 md:px-6 pb-4 md:pb-6 space-y-3 md:space-y-4 mt-4 md:mt-6"
+          >
             <div className="space-y-3">
               <div className="relative">
                 <Input
@@ -139,16 +281,34 @@ export function TradingPanel({ agentData }: TradingPanelProps) {
                 <div className="text-xs md:text-sm text-orange-800">
                   <div className="flex justify-between items-center">
                     <span>You will receive:</span>
-                    <span className="font-semibold">≈ 0.1 ETH</span>
+                    <span className="font-semibold">
+                      ≈{" "}
+                      {saleReturn
+                        ? Number(formatEther(saleReturn)).toLocaleString(
+                            undefined,
+                            { maximumFractionDigits: 2 }
+                          )
+                        : "0"}{" "}
+                      ETH
+                    </span>
                   </div>
                   <div className="flex justify-between items-center mt-1">
                     <span>Est. slippage:</span>
-                    <span className="font-semibold text-orange-600">0.3%</span>
+                    <span className="font-semibold text-orange-600">2%</span>
                   </div>
                 </div>
               </div>
 
-              <Button className="w-full h-10 md:h-12 bg-orange-600 hover:bg-orange-700 text-white font-medium text-sm md:text-base">
+              <Button
+                className="w-full h-10 md:h-12 bg-orange-600 hover:bg-orange-700 text-white font-medium text-sm md:text-base"
+                onClick={handleSell}
+                disabled={
+                  isSelling ||
+                  isSellingPending ||
+                  !bondingCurveAddress ||
+                  !sellAmount
+                }
+              >
                 <TrendingDown className="w-3 h-3 md:w-4 md:h-4 mr-2" />
                 PLACE SELL ORDER
               </Button>
@@ -159,8 +319,12 @@ export function TradingPanel({ agentData }: TradingPanelProps) {
         {/* Bonding Curve Status */}
         <div className="px-4 md:px-6 py-3 md:py-4 bg-muted/50 border-t border-border">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0 mb-2">
-            <span className="text-xs md:text-sm font-medium text-foreground">Bonding Curve Progress</span>
-            <span className="text-xs md:text-sm text-neutral-400">{agentData.bondingCurveProgress}%</span>
+            <span className="text-xs md:text-sm font-medium text-foreground">
+              Bonding Curve Progress
+            </span>
+            <span className="text-xs md:text-sm text-neutral-400">
+              {agentData.bondingCurveProgress}%
+            </span>
           </div>
           <Progress
             value={agentData.bondingCurveProgress}

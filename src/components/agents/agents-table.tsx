@@ -17,6 +17,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
+import { useBondingCurveDetails } from "@/hooks/useBondingCurveDetails";
+// import { useBondingCurveTokens } from "@/hooks/useBondingCurveToken";
 
 type Agent = {
   id: string;
@@ -166,6 +168,9 @@ const allColumns = [
 ] as const;
 
 function AgentsTable() {
+  const { data: details } = useBondingCurveDetails();
+  console.log(details);
+
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
     ...allColumns,
   ]);
@@ -174,15 +179,14 @@ function AgentsTable() {
   const router = useRouter();
   const { authenticated: isAuthenticated } = usePrivy();
 
-  const filteredData = data.filter((agent) => {
+  const filteredData = details.filter((agent) => {
     if (!searchFilter) return true;
 
     const searchLower = searchFilter.toLowerCase();
 
     return (
-      agent.name.toLowerCase().includes(searchLower) ||
-      agent.symbol.toLowerCase().includes(searchLower) ||
-      agent.tags.some((tag) => tag.toLowerCase().includes(searchLower))
+      agent.issuanceToken.name.toLowerCase().includes(searchLower) ||
+      agent.issuanceToken.symbol.toLowerCase().includes(searchLower)
     );
   });
 
@@ -204,12 +208,12 @@ function AgentsTable() {
             className="w-full md:w-64 bg-neutral-800 border-neutral-600 text-white placeholder:text-neutral-400"
           />
           {isAuthenticated && (
-          <Link href="/create">
-            <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-              <span className="sm:hidden">Create +</span>
-              <span className="hidden sm:inline">Create Agent</span>
-            </Button>
-          </Link>
+            <Link href="/create">
+              <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
+                <span className="sm:hidden">Create +</span>
+                <span className="hidden sm:inline">Create Agent</span>
+              </Button>
+            </Link>
           )}
         </div>
       </div>
@@ -256,34 +260,41 @@ function AgentsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.length ? (
-              filteredData.map((agent) => (
+            {filteredData && filteredData.length ? (
+              filteredData.map((token) => (
                 <TableRow
-                  key={agent.id}
+                  key={token.fundingManagerAddress}
                   className="border-neutral-700 hover:bg-neutral-800 cursor-pointer"
-                  onClick={() => router.push(`/agent/${agent.id}`)}
+                  onClick={() =>
+                    router.push(`/agent/${token.fundingManagerAddress}`)
+                  }
                 >
                   {visibleColumns.includes("Agent") && (
                     <TableCell className="font-medium whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={agent.avatar} alt={agent.name} />
+                          <AvatarImage
+                            src="/33labs.jpg"
+                            alt={token.issuanceToken.name}
+                          />
                           <AvatarFallback className="bg-neutral-700 text-neutral-300">
-                            {agent.name[0]}
+                            {token.issuanceToken.name[0]}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-neutral-300">{agent.name}</span>
+                        <span className="text-neutral-300">
+                          {token.issuanceToken.name}
+                        </span>
                       </div>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Symbol") && (
                     <TableCell className="whitespace-nowrap font-mono text-neutral-300">
-                      {agent.symbol}
+                      ${token.issuanceToken.symbol}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Market Cap") && (
                     <TableCell className="whitespace-nowrap text-neutral-300">
-                      {agent.marketCap}
+                      {0}
                     </TableCell>
                   )}
                   {visibleColumns.includes("1d change") && (
@@ -291,23 +302,23 @@ function AgentsTable() {
                       <span
                         className={cn(
                           "font-medium",
-                          agent.change1d.startsWith("+")
+                          "0".startsWith("+")
                             ? "text-green-400"
                             : "text-red-400"
                         )}
                       >
-                        {agent.change1d}
+                        {0}
                       </span>
                     </TableCell>
                   )}
                   {visibleColumns.includes("Holders") && (
                     <TableCell className="whitespace-nowrap text-neutral-300">
-                      {agent.holders}
+                      {0}
                     </TableCell>
                   )}
                   {visibleColumns.includes("AUM") && (
                     <TableCell className="whitespace-nowrap text-neutral-300">
-                      {agent.aum}
+                      {0}
                     </TableCell>
                   )}
                   {visibleColumns.includes("Returns") && (
@@ -315,12 +326,12 @@ function AgentsTable() {
                       <span
                         className={cn(
                           "font-medium",
-                          agent.returns.startsWith("+")
+                          "0".startsWith("+")
                             ? "text-green-400"
                             : "text-red-400"
                         )}
                       >
-                        {agent.returns}
+                        {0}
                       </span>
                     </TableCell>
                   )}

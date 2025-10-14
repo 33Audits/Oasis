@@ -7,6 +7,7 @@ interface AgentSummaryProps {
   agentData: {
     id: string;
     name: string;
+    symbol: string;
     avatar: string;
     tags: string[];
     marketCap: string;
@@ -35,7 +36,7 @@ export function AgentSummary({ agentData }: AgentSummaryProps) {
               {agentData.name}
             </h1>
             <span className="text-lg text-neutral-400 whitespace-nowrap">
-              #{agentData.id}
+              ${agentData.symbol}
             </span>
           </div>
         </div>

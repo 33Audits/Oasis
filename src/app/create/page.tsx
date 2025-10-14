@@ -19,7 +19,8 @@ export default function CreateBondingCurvePage() {
   const { formData } = useBondingCurveStore();
 
   const CurrentStepComponent =
-    steps.find((step) => step.id === currentStep)?.component || TokenParametersStep;
+    steps.find((step) => step.id === currentStep)?.component ||
+    TokenParametersStep;
 
   const canProceed = (step: number) => {
     switch (step) {
@@ -27,12 +28,9 @@ export default function CreateBondingCurvePage() {
         return formData.name && formData.symbol && formData.maxSupply;
       case 2:
         return (
-          formData.initialIssuanceSupply &&
-          formData.initialCollateralSupply
+          formData.initialIssuanceSupply && formData.initialCollateralSupply
         );
       case 3:
-        return formData.vaultAddress && formData.feeVaultAddress && formData.threshold;
-      case 4:
         return formData.stakeAmount;
       default:
         return false;
@@ -114,11 +112,13 @@ export default function CreateBondingCurvePage() {
             Previous
           </Button>
           <Button
-            onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
+            onClick={() => setCurrentStep(Math.min(3, currentStep + 1))}
             disabled={currentStep === 4 || !canProceed(currentStep)}
-            className={`bg-white text-black rounded-xl hover:bg-white/90 ${currentStep === 4 ? "hidden" : "block"}`}
+            className={`bg-white text-black rounded-xl hover:bg-white/90 ${
+              currentStep === 3 ? "hidden" : "block"
+            }`}
           >
-            {currentStep === 4 ? "Create Bonding Curve" : "Next"}
+            {currentStep === 3 ? "Create Bonding Curve" : "Next"}
           </Button>
         </div>
       </div>
