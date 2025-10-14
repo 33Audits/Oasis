@@ -2,10 +2,13 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { shortenTokenAddress } from "@/lib/utils";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 interface AgentSummaryProps {
-  agentData: {
-    id: string;
+  bondingCurveData: {
+    bondingCurveAddress: `0x${string}`;
     name: string;
     symbol: string;
     avatar: string;
@@ -18,7 +21,7 @@ interface AgentSummaryProps {
   };
 }
 
-export function AgentSummary({ agentData }: AgentSummaryProps) {
+export function AgentSummary({ bondingCurveData }: AgentSummaryProps) {
   return (
     <div className="p-4 sm:p-6 bg-card border border-border rounded-xl">
       {/* Mobile layout */}
@@ -26,32 +29,19 @@ export function AgentSummary({ agentData }: AgentSummaryProps) {
         {/* Avatar + Name + ID in one row */}
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16 bg-black shrink-0">
-            <AvatarImage src={agentData.avatar} alt={agentData.name} />
+            <AvatarImage src={bondingCurveData.avatar} alt={bondingCurveData.name} />
             <AvatarFallback className="bg-black text-white text-lg">
               S
             </AvatarFallback>
           </Avatar>
           <div className="flex items-center gap-3 min-w-0">
             <h1 className="text-2xl font-bold text-foreground leading-tight truncate">
-              {agentData.name}
+              {bondingCurveData.name}
             </h1>
-            <span className="text-lg text-neutral-400 whitespace-nowrap">
-              ${agentData.symbol}
+            <span className="text-lg text-red-500 whitespace-nowrap">
+              ${bondingCurveData.symbol}
             </span>
           </div>
-        </div>
-
-        {/* Tags below */}
-        <div className="flex gap-2 flex-wrap">
-          {agentData.tags.map((tag, idx) => (
-            <Badge
-              key={idx}
-              variant="secondary"
-              className="bg-neutral-700 text-neutral-300 text-xs"
-            >
-              {tag}
-            </Badge>
-          ))}
         </div>
 
         {/* Stats below */}
@@ -59,40 +49,40 @@ export function AgentSummary({ agentData }: AgentSummaryProps) {
           <div className="text-center">
             <span className="text-neutral-400 block">Market cap: </span>
             <span className="text-foreground font-medium break-words">
-              {agentData.marketCap}
+              {bondingCurveData.marketCap}
             </span>
           </div>
           <div className="text-center">
             <span className="text-neutral-400 block">1d change: </span>
             <span className="text-green-400 font-medium break-words">
-              {agentData.change1d}
+              {bondingCurveData.change1d}
             </span>
           </div>
           <div className="text-center">
             <span className="text-neutral-400 block">Holders: </span>
             <span className="text-foreground font-medium break-words">
-              {agentData.holders}
+              {bondingCurveData.holders}
             </span>
           </div>
           <div className="text-center">
             <span className="text-neutral-400 block">AUM: </span>
             <span className="text-foreground font-medium break-words">
-              {agentData.aum}
+              {bondingCurveData.aum}
             </span>
           </div>
           <div className="col-span-2 text-center">
             <span className="text-neutral-400 block">Returns: </span>
             <span className="text-green-400 font-medium break-words">
-              {agentData.returns}
+              {bondingCurveData.returns}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Desktop layout - preserve original design */}
+      {/* Desktop layout */}
       <div className="hidden sm:flex items-center gap-6">
         <Avatar className="h-20 w-20 bg-black">
-          <AvatarImage src={agentData.avatar} alt={agentData.name} />
+          <AvatarImage src={bondingCurveData.avatar} alt={bondingCurveData.name} />
           <AvatarFallback className="bg-black text-white text-xl">
             S
           </AvatarFallback>
@@ -101,55 +91,48 @@ export function AgentSummary({ agentData }: AgentSummaryProps) {
         <div className="flex-1">
           <div className="flex items-center gap-4 mb-2">
             <h1 className="text-3xl font-bold text-foreground">
-              {agentData.name}
+              {bondingCurveData.name}
             </h1>
-            <span className="text-xl text-neutral-400">
-              #{agentData.id}
+            <span className="inline-flex items-center gap-2 text-xl text-neutral-400">
+              {shortenTokenAddress(bondingCurveData.bondingCurveAddress)}
+
+              <Link href={`https://sepolia.etherscan.io/token/${bondingCurveData.bondingCurveAddress}`} target="_blank">
+                <ExternalLink className="h-4 w-4 text-neutral-400" />
+              </Link>
             </span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-            <div className="flex gap-2 flex-wrap">
-              {agentData.tags.map((tag, idx) => (
-                <Badge
-                  key={idx}
-                  variant="secondary"
-                  className="bg-neutral-700 text-neutral-300 text-sm"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
 
             <div className="grid grid-cols-2 sm:flex sm:gap-8 text-sm gap-4">
               <div>
                 <span className="text-neutral-400">Market cap: </span>
                 <span className="text-foreground font-medium">
-                  {agentData.marketCap}
+                  {bondingCurveData.marketCap}
                 </span>
               </div>
               <div>
                 <span className="text-neutral-400">1d change: </span>
                 <span className="text-green-400 font-medium">
-                  {agentData.change1d}
+                  {bondingCurveData.change1d}
                 </span>
               </div>
               <div>
                 <span className="text-neutral-400">Holders: </span>
                 <span className="text-foreground font-medium">
-                  {agentData.holders}
+                  {bondingCurveData.holders}
                 </span>
               </div>
               <div>
                 <span className="text-neutral-400">AUM: </span>
                 <span className="text-foreground font-medium">
-                  {agentData.aum}
+                  {bondingCurveData.aum}
                 </span>
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <span className="text-neutral-400">Returns: </span>
                 <span className="text-green-400 font-medium">
-                  {agentData.returns}
+                  {bondingCurveData.returns}
                 </span>
               </div>
             </div>

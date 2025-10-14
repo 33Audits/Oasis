@@ -27,15 +27,6 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
-/**
- * Format wei (18 decimals) to human readable token amount
- */
-export function formatTokenAmount(weiValue: string): string {
-  if (!weiValue || weiValue === "0") return "";
-  try {
-    const value = BigInt(weiValue);
-    return (Number(value) / 1e18).toString();
-  } catch {
-    return "";
-  }
+export function shortenTokenAddress(address: `0x${string}`) {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }

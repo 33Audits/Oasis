@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,14 +11,17 @@ import { AnimatedCard } from "@/components/ui/animated-card";
 import { Rocket, DollarSign, Copy } from "lucide-react";
 import { useBondingCurveStore } from "@/lib/store";
 import { useCreateBondingCurve } from "@/hooks/useCreateBondingCurve";
-import { copyToClipboard, formatTokenAmount } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/utils";
 import { toast } from "sonner";
-import { parseEther } from "viem";
+import { formatUnits, parseEther } from "viem";
+
 
 export function DeployStep() {
   const { formData, updateFormData, resetForm } = useBondingCurveStore();
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployProgress, setDeployProgress] = useState(0);
+  
+  const router = useRouter();
 
   const { createBondingCurve, minDepositAmount, bcWorkflowAddress, isPending } =
     useCreateBondingCurve();
@@ -90,6 +94,8 @@ export function DeployStep() {
       
       resetForm();
 
+      router.push(`/`);
+
       console.log("Bonding curve created successfully:", result);
     } catch (err) {
       setDeployProgress(0);
@@ -132,7 +138,7 @@ export function DeployStep() {
                 <Input
                   id="stakeAmount"
                   placeholder="e.g. 100"
-                  value={formatTokenAmount(formData.stakeAmount)}
+                  value={formatUnits(BigInt(formData.stakeAmount), 18)}
                   onChange={(e) =>
                     handleInputChange("stakeAmount", e.target.value)
                   }
@@ -141,7 +147,7 @@ export function DeployStep() {
                 <p className="text-xs text-neutral-400">
                   Minimum stake:{" "}
                   {minDepositAmount
-                    ? formatTokenAmount(minDepositAmount.toString())
+                    ? formatUnits(minDepositAmount, 18)
                     : "Loading..."}{" "}
                   GAIA tokens
                 </p>
@@ -245,7 +251,7 @@ export function DeployStep() {
                   <p className="text-neutral-400">
                     Max Supply:{" "}
                     <span className="text-primary font-medium">
-                      { formatTokenAmount(formData.maxSupply) || "Not set"}
+                      { formatUnits(BigInt(formData.maxSupply), 18) || "Not set"}
                     </span>
                   </p>
                 </div>
@@ -279,7 +285,7 @@ export function DeployStep() {
                   </h3>
                   <p className="text-neutral-400 text-sm">
                     {formData.stakeAmount
-                      ? `${formatTokenAmount(formData.stakeAmount)} GAIA tokens`
+                      ? `${formatUnits(BigInt(formData.stakeAmount), 18)} GAIA`
                       : "Not set"}
                   </p>
                 </div>

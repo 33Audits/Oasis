@@ -6,21 +6,18 @@ import { Label } from "@/components/ui/label"
 import { AnimatedCard } from "@/components/ui/animated-card"
 import { Plus } from "lucide-react"
 import { useBondingCurveStore } from "@/lib/store"
-import { parseEther } from "viem"
-import { formatTokenAmount } from "@/lib/utils"
+import { formatUnits, parseEther } from "viem"
 
 export function TokenParametersStep() {
   const { formData, updateFormData } = useBondingCurveStore()
 
   const handleInputChange = (field: string, value: string | number[]) => {
     if (field === "maxSupply") {
-      // Convert input to wei (18 decimals) using parseEther
       const stringValue = Array.isArray(value) ? value[0]?.toString() : value;
       try {
         const weiValue = parseEther(stringValue || "0");
         updateFormData({ [field]: weiValue.toString() });
       } catch (error) {
-        // If parsing fails, keep the current value
         console.warn("Invalid max supply:", value);
       }
     } else {
@@ -91,7 +88,7 @@ export function TokenParametersStep() {
                 <Input
                   id="maxSupply"
                   placeholder="e.g. 1000000"
-                  value={formatTokenAmount(formData.maxSupply)}
+                  value={formatUnits(BigInt(formData.maxSupply), 18)}
                   onChange={(e) => handleInputChange("maxSupply", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
@@ -131,7 +128,7 @@ export function TokenParametersStep() {
                   <div className="space-y-1 text-sm text-neutral-400">
                     <p>Decimals: {formData.decimals}</p>
                     {formData.maxSupply && (
-                      <p>Max Supply: {formData.maxSupply ? formatTokenAmount(formData.maxSupply) : "Not set"}</p>
+                      <p>Max Supply: {formData.maxSupply ? formatUnits(BigInt(formData.maxSupply), 18) : "Not set"}</p>
                     )}
                   </div>
                 </div>

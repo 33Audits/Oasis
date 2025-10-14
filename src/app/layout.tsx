@@ -52,7 +52,7 @@ export default function RootLayout({
             <Navbar />
             {children}
           </SmoothScrolling>
-          <Toaster richColors />
+          <Toaster richColors position="top-center" />
         </Providers>
       </body>
     </html>

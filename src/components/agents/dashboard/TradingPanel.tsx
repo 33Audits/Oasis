@@ -12,8 +12,8 @@ import { useReadContract } from "wagmi";
 import { abis } from "@/lib/abis";
 import { parseEther, formatEther } from "viem";
 import { useAccount } from "wagmi";
-import { useWallets } from "@privy-io/react-auth";
 import { toast } from "sonner";
+import Link from "next/link";
 import { useSellFromBondingCurve } from "@/hooks/useSellFromBondingCurve";
 
 interface TradingPanelProps {
@@ -82,10 +82,16 @@ export function TradingPanel({
       });
 
       toast.success(
-        `Successfully bought tokens! Transaction: ${result.txid.slice(
-          0,
-          10
-        )}...`
+        <div className="flex flex-col gap-1">
+          <div>Successfully bought tokens!</div>
+          <Link
+            href={`https://sepolia.etherscan.io/tx/${result.txid}`}
+            target="_blank"
+            className="text-blue-400 hover:text-blue-300 underline text-sm"
+          >
+            View transaction: {result.txid.slice(0, 10)}...{result.txid.slice(-4)}
+          </Link>
+        </div>
       );
 
       // Reset buy amount to default
@@ -118,7 +124,16 @@ export function TradingPanel({
       });
 
       toast.success(
-        `Successfully sold tokens! Transaction: ${result.txid.slice(0, 10)}...`
+        <div className="flex flex-col gap-1">
+          <div>Successfully sold tokens!</div>
+          <Link
+            href={`https://sepolia.etherscan.io/tx/${result.txid}`}
+            target="_blank"
+            className="text-blue-400 hover:text-blue-300 underline text-sm"
+          >
+            View transaction: {result.txid.slice(0, 10)}...{result.txid.slice(-4)}
+          </Link>
+        </div>
       );
     } catch (error: any) {
       console.error("Sell transaction failed:", error);
@@ -134,7 +149,7 @@ export function TradingPanel({
         {/* Trading Interface Header */}
         <div className="p-4 md:p-6 pb-4 border-b border-border">
           <h3 className="text-base md:text-lg font-semibold text-foreground mb-2">
-            Trade {agentData.symbol}
+            Trade ${agentData.symbol}
           </h3>
           <p className="text-xs md:text-sm text-neutral-400">
             Execute buy and sell orders
@@ -175,7 +190,7 @@ export function TradingPanel({
                   className="text-lg md:text-xl h-12 md:h-14 pl-4 pr-12 md:pr-16 border-2 focus:border-green-500 transition-colors"
                 />
                 <div className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 text-xs md:text-sm text-neutral-400 font-medium">
-                  ETH
+                  GAIA
                 </div>
               </div>
 
@@ -198,7 +213,7 @@ export function TradingPanel({
                     className="h-8 md:h-10 text-xs md:text-sm hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-colors"
                     onClick={() => setBuyAmount(amount)}
                   >
-                    {amount} ETH
+                    {amount} GAIA
                   </Button>
                 ))}
               </div>
@@ -260,7 +275,13 @@ export function TradingPanel({
               </div>
 
               <div className="text-xs md:text-sm text-neutral-400 text-center">
-                ≈ $342.00 USD
+                ≈ $GAIA {" "}
+                {saleReturn
+                  ? Number(formatEther(saleReturn)).toLocaleString(
+                      undefined,
+                      { maximumFractionDigits: 2 }
+                    )
+                  : "0"}
               </div>
 
               <div className="grid grid-cols-3 gap-2">
@@ -272,7 +293,7 @@ export function TradingPanel({
                     className="h-8 md:h-10 text-xs md:text-sm hover:bg-orange-50 hover:border-orange-300 hover:text-orange-700 transition-colors"
                     onClick={() => setSellAmount(amount)}
                   >
-                    {amount}K {agentData.symbol}
+                    {amount} {agentData.symbol}
                   </Button>
                 ))}
               </div>
@@ -289,7 +310,7 @@ export function TradingPanel({
                             { maximumFractionDigits: 2 }
                           )
                         : "0"}{" "}
-                      ETH
+                      GAIA
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-1">
@@ -317,7 +338,7 @@ export function TradingPanel({
         </Tabs>
 
         {/* Bonding Curve Status */}
-        <div className="px-4 md:px-6 py-3 md:py-4 bg-muted/50 border-t border-border">
+        {/* <div className="px-4 md:px-6 py-3 md:py-4 bg-muted/50 border-t border-border">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0 mb-2">
             <span className="text-xs md:text-sm font-medium text-foreground">
               Bonding Curve Progress
@@ -333,7 +354,7 @@ export function TradingPanel({
           <div className="text-center text-xs md:text-sm text-green-400 font-medium">
             Token has graduated!
           </div>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

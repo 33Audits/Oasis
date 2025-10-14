@@ -6,8 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { AnimatedCard } from "@/components/ui/animated-card"
 import { useBondingCurveStore } from "@/lib/store"
-import { parseEther } from "viem"
-import { formatTokenAmount } from "@/lib/utils"
+import { formatUnits, parseEther } from "viem"
 
 export function BondingCurveStep() {
   const { formData, updateFormData } = useBondingCurveStore()
@@ -83,7 +82,7 @@ export function BondingCurveStep() {
                 <Input
                   id="initialIssuanceSupply"
                   placeholder="e.g. 1000000"
-                  value={formatTokenAmount(formData.initialIssuanceSupply)}
+                  value={formatUnits(BigInt(formData.initialIssuanceSupply), 18)}
                   onChange={(e) => handleInputChange("initialIssuanceSupply", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
@@ -97,7 +96,7 @@ export function BondingCurveStep() {
                 <Input
                   id="initialCollateralSupply"
                   placeholder="e.g. 1000000"
-                  value={formatTokenAmount(formData.initialCollateralSupply)}
+                  value={formatUnits(BigInt(formData.initialCollateralSupply), 18)}
                   onChange={(e) => handleInputChange("initialCollateralSupply", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
@@ -132,12 +131,12 @@ export function BondingCurveStep() {
                 <div className="space-y-2 text-sm">
                   <p className="text-neutral-400">
                     Issuance Supply: <span className="text-primary font-medium">
-                      {formData.initialIssuanceSupply ? formatTokenAmount(formData.initialIssuanceSupply) : "Not set"}
+                      {formData.initialIssuanceSupply ? formatUnits(BigInt(formData.initialIssuanceSupply), 18) : "Not set"}
                     </span>
                   </p>
                   <p className="text-neutral-400">
                     Collateral Supply: <span className="text-primary font-medium">
-                      {formData.initialCollateralSupply ? formatTokenAmount(formData.initialCollateralSupply) : "Not set"}
+                      {formData.initialCollateralSupply ? formatUnits(BigInt(formData.initialCollateralSupply), 18) : "Not set"}
                     </span>
                   </p>
                 </div>

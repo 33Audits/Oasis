@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import { cn, shortenTokenAddress } from "@/lib/utils";
 import {
   RefreshCw,
   ExternalLink,
@@ -22,6 +22,7 @@ import {
   CartesianGrid,
   Cell
 } from "recharts";
+import Link from "next/link";
 
 const candlestickData = [
     { time: "00:00", open: 34, high: 41, low: 29, close: 38, volume: 2340000 },
@@ -119,8 +120,8 @@ const chartConfig = {
 };
 
 interface ChartPanelProps {
-  agentData: {
-    tokenAddress: string;
+  bondingCurveData: {
+    tokenAddress?: `0x${string}`;
     marketCap: string;
     change1d: string;
     ath: string;
@@ -135,7 +136,7 @@ interface ChartPanelProps {
   };
 }
 
-export function ChartPanel({ agentData }: ChartPanelProps) {
+export function ChartPanel({ bondingCurveData }: ChartPanelProps) {
   const [selectedTimeframe, setSelectedTimeframe] = useState("24h");
 
   return (
@@ -145,11 +146,17 @@ export function ChartPanel({ agentData }: ChartPanelProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
             <CardTitle className="text-lg font-medium">
-              Token <span className="font-mono text-white/70">{agentData.tokenAddress}</span>
+              Token {bondingCurveData.tokenAddress && (
+                <>
+                  <div className="inline-flex items-center gap-2">
+                  <span className="font-mono text-white/70">{shortenTokenAddress(bondingCurveData.tokenAddress)}</span>
+                  <Link href={`https://sepolia.etherscan.io/token/${bondingCurveData.tokenAddress}`} target="_blank">
+                    <ExternalLink className="h-4 w-4 text-neutral-400" />
+                  </Link>
+                  </div>
+                </>
+              )}
             </CardTitle>
-            <Button variant="ghost" size="sm">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-neutral-400">
@@ -163,16 +170,16 @@ export function ChartPanel({ agentData }: ChartPanelProps) {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-foreground">
-                Market Cap {agentData.marketCap}
+                Market Cap {bondingCurveData.marketCap}
               </div>
               <div className="text-green-400 font-medium">
-                +$1.14M ({agentData.change1d}) 24hr
+                +$1.14M ({bondingCurveData.change1d}) 24hr
               </div>
             </div>
             <div className="text-right">
               <div className="text-sm text-neutral-400">ATH</div>
               <div className="text-lg font-medium text-foreground">
-                {agentData.ath}
+                {bondingCurveData.ath}
               </div>
             </div>
           </div>
@@ -349,7 +356,7 @@ export function ChartPanel({ agentData }: ChartPanelProps) {
                   <div>Txn</div>
                 </div>
 
-                {agentData.trades.map((trade, idx) => (
+                {bondingCurveData.trades.map((trade, idx) => (
                   <div
                     key={idx}
                     className="grid grid-cols-6 gap-4 text-sm py-2 border-b border-border/50"

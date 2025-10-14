@@ -266,7 +266,7 @@ function AgentsTable() {
                   key={token.fundingManagerAddress}
                   className="border-neutral-700 hover:bg-neutral-800 cursor-pointer"
                   onClick={() =>
-                    router.push(`/agent/${token.fundingManagerAddress}`)
+                    router.push(`/project/${token.fundingManagerAddress}`)
                   }
                 >
                   {visibleColumns.includes("Agent") && (

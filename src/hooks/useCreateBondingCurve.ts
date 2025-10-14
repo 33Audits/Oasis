@@ -58,7 +58,7 @@ export function useCreateBondingCurve() {
       address: contractAddress[sepolia.id].FM_ExpectingPayment_v1,
       abi: abis.FM_ExpectingPayment_v1,
       functionName: "deposit",
-      args: [params.stakeAmount],
+      args: [params.stakeAmount]
     });
 
     const txid = await writeContractAsync({
@@ -87,6 +87,10 @@ export function useCreateBondingCurve() {
 
     if (bondingCurveEvent && "bcWorkflowAddress" in bondingCurveEvent.args) {
       setBcWorkflowAddress(bondingCurveEvent.args.bcWorkflowAddress);
+    }
+
+    if (receipt.status !== "success") {
+      throw new Error("Transaction failed: " + receipt.status);
     }
 
     return { txid, receipt };

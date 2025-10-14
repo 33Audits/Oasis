@@ -5,30 +5,26 @@ import {
   AgentSummary,
   ChartPanel,
   TradingPanel,
-  TradingPersonality,
   TopHolders,
 } from "@/components/agents/dashboard";
 import { useTokenDetails } from "@/hooks/useTokenDetails";
 
 // Mock data for the agent (keeping dummy marketCap and other data)
-const getAgentData = (id: string, tokenName?: string, tokenSymbol?: string, tokenAddress?: string) => ({
-  id,
+const getAgentData = (bondingCurveAddress: `0x${string}`, tokenName?: string, tokenSymbol?: string, issuanceTokenAddress?: string) => (
+  {
+  bondingCurveAddress: bondingCurveAddress,
   name: tokenName || "AGENT",
   symbol: tokenSymbol || "AGENT",
   avatar: "/33labs.jpg",
-  tokenAddress: tokenAddress || "0x13...AuB9",
+  tokenAddress: issuanceTokenAddress as `0x${string}`,
   tags: ["DEXs", "Altcoins", "Meme"],
-  marketCap: "$3.5M", // Keep dummy marketCap data
+  marketCap: "$3.5M",
   change1d: "+47.25%",
   holders: "4,206",
   aum: "$40M",
   returns: "+34,456%",
   ath: "$7.4M",
   bondingCurveProgress: 100,
-  tradingPersonality:
-    "This agent has an ear on the ground through Trendinsoon and Kaho, plus some secret alpha groups. Buys memes early, sells at the top.",
-  policies: ["SSL", "Agent", "Locked"],
-  agentWallet: "0x12...AuB9",
   performance: {
     allTime: "+34,456%",
     thisMonth: "+150%",
@@ -61,41 +57,28 @@ const getAgentData = (id: string, tokenName?: string, tokenSymbol?: string, toke
   ],
 });
 
-export default function AgentDashboard({ params }: { params: Promise<{ id: string }> }) {
+export default function AgentDashboard({ params }: { params: Promise<{ address: string }> }) {
   const resolvedParams = React.use(params);
 
-  const { data: tokenDetails } = useTokenDetails(resolvedParams.id as `0x${string}`);
+  const { data: tokenDetails } = useTokenDetails(resolvedParams.address as `0x${string}`);
 
-  const agentData = getAgentData(
-    resolvedParams.id,
+  const bondingCurveData = getAgentData(
+    resolvedParams.address as `0x${string}`,
     tokenDetails?.name,
     tokenDetails?.symbol,
-    tokenDetails?.address ? tokenDetails.address : undefined
+    tokenDetails?.address ? tokenDetails.address as `0x${string}` : undefined
   );
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-6 space-y-4 md:space-y-6">
-        {/* Agent Summary Section */}
-        <AgentSummary agentData={agentData} />
+        <AgentSummary bondingCurveData={bondingCurveData} />
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-          {/* Main Chart Panel */}
-          <ChartPanel agentData={agentData} />
-
-          {/* Right Sidebar */}
+          <ChartPanel bondingCurveData={bondingCurveData} />
           <div className="space-y-4 md:space-y-6">
-            {/* Trading Panel */}
-            <TradingPanel agentData={agentData} bondingCurveAddress={resolvedParams.id as `0x${string}`} issuanceToken={tokenDetails?.address as `0x${string}`} />
-
-            {/* Trading Personality */}
-            <TradingPersonality tradingPersonality={agentData.tradingPersonality} />
-
-            {/* Policies & Agent Wallet */}
-            {/* <PoliciesWallet policies={agentData.policies} agentWallet={agentData.agentWallet} /> */}
-
-            {/* Top Holders */}
-            <TopHolders holders={agentData.holders} topHolders={agentData.topHolders} />
+            <TradingPanel agentData={bondingCurveData} bondingCurveAddress={resolvedParams.address as `0x${string}`} issuanceToken={tokenDetails?.address as `0x${string}`} />
+            <TopHolders holders={bondingCurveData.holders} topHolders={bondingCurveData.topHolders} />
           </div>
         </div>
       </div>
