@@ -2,24 +2,24 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 export interface BondingCurveFormData {
-  // Step 1: Token Parameters
+  // Token Parameters
   name: string
   symbol: string
   decimals: number
   maxSupply: string
 
-  // Step 2: Bonding Curve Parameters
+  // Bonding Curve Parameters
   reserveRatioForBuying: number
   reserveRatioForSelling: number
   initialIssuanceSupply: string
   initialCollateralSupply: string
 
-  // Step 3: Vault Configuration
+  // Vault Configuration
   vaultAddress: string
   feeVaultAddress: string
   threshold: string
 
-  // Step 4: Deployment
+  // Deployment
   stakeAmount: string
 }
 
@@ -32,24 +32,24 @@ interface BondingCurveStore {
 }
 
 const initialFormData: BondingCurveFormData = {
-  // Step 1: Token Parameters
+  // Token Parameters
   name: "",
   symbol: "",
   decimals: 18,
   maxSupply: "",
 
-  // Step 2: Bonding Curve Parameters
+  // Bonding Curve Parameters
   reserveRatioForBuying: 50,
   reserveRatioForSelling: 50,
   initialIssuanceSupply: "",
   initialCollateralSupply: "",
 
-  // Step 3: Vault Configuration
+  // Vault Configuration
   vaultAddress: "",
   feeVaultAddress: "",
   threshold: "",
 
-  // Step 4: Deployment
+  // Deployment
   stakeAmount: "",
 }
 
@@ -67,6 +67,16 @@ export const useBondingCurveStore = create<BondingCurveStore>()(
     }),
     {
       name: "bonding-curve-launchpad-storage",
+      storage: {
+        getItem: (name) => {
+          const str = sessionStorage.getItem(name);
+          return str ? JSON.parse(str) : null;
+        },
+        setItem: (name, value) => {
+          sessionStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => sessionStorage.removeItem(name),
+      },
     },
   ),
 )

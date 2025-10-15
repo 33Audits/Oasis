@@ -15,12 +15,11 @@ import { copyToClipboard } from "@/lib/utils";
 import { toast } from "sonner";
 import { formatUnits, parseEther } from "viem";
 
-
 export function DeployStep() {
   const { formData, updateFormData, resetForm } = useBondingCurveStore();
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployProgress, setDeployProgress] = useState(0);
-  
+
   const router = useRouter();
 
   const { createBondingCurve, minDepositAmount, bcWorkflowAddress, isPending } =
@@ -62,9 +61,11 @@ export function DeployStep() {
       setDeployProgress(25);
 
       const params = {
-        vaultAddress: "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
-        feeVaultAddress: "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
-        threshold: BigInt(formData.threshold),
+        vaultAddress:
+          "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
+        feeVaultAddress:
+          "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
+        threshold: parseEther("10000"),
         bcParams: {
           reserveRatioForBuying: formData.reserveRatioForBuying,
           reserveRatioForSelling: formData.reserveRatioForSelling,
@@ -91,10 +92,10 @@ export function DeployStep() {
           bcWorkflowAddress ? ` at ${bcWorkflowAddress}` : ""
         }`,
       });
-      
+      setIsDeploying(false);
       resetForm();
 
-      router.push(`/`);
+      router.push(`/#agents`);
 
       console.log("Bonding curve created successfully:", result);
     } catch (err) {
@@ -251,7 +252,7 @@ export function DeployStep() {
                   <p className="text-neutral-400">
                     Max Supply:{" "}
                     <span className="text-primary font-medium">
-                      { formatUnits(BigInt(formData.maxSupply), 18) || "Not set"}
+                      {formatUnits(BigInt(formData.maxSupply), 18) || "Not set"}
                     </span>
                   </p>
                 </div>

@@ -199,7 +199,7 @@ export function TradingPanel({
                 {purchaseReturn
                   ? Number(formatEther(purchaseReturn)).toLocaleString(
                       undefined,
-                      { maximumFractionDigits: 2 }
+                      { maximumFractionDigits: 5 }
                     )
                   : "0"}
               </div>
@@ -227,7 +227,7 @@ export function TradingPanel({
                       {purchaseReturn
                         ? Number(formatEther(purchaseReturn)).toLocaleString(
                             undefined,
-                            { maximumFractionDigits: 2 }
+                            { maximumFractionDigits: 5 }
                           )
                         : "0"}{" "}
                       {agentData.symbol}
@@ -279,7 +279,7 @@ export function TradingPanel({
                 {saleReturn
                   ? Number(formatEther(saleReturn)).toLocaleString(
                       undefined,
-                      { maximumFractionDigits: 2 }
+                      { maximumFractionDigits: 5 }
                     )
                   : "0"}
               </div>
@@ -307,7 +307,7 @@ export function TradingPanel({
                       {saleReturn
                         ? Number(formatEther(saleReturn)).toLocaleString(
                             undefined,
-                            { maximumFractionDigits: 2 }
+                            { maximumFractionDigits: 5 }
                           )
                         : "0"}{" "}
                       GAIA
