@@ -30,7 +30,7 @@ export function TradingPanel({
   bondingCurveAddress,
   issuanceToken,
 }: TradingPanelProps) {
-  const [tradeTab, setTradeTab] = useState("SELL");
+  const [tradeTab, setTradeTab] = useState("BUY");
   const [buyAmount, setBuyAmount] = useState("0");
   const [sellAmount, setSellAmount] = useState("0");
   const [isBuying, setIsBuying] = useState(false);

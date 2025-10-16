@@ -3,19 +3,12 @@ import { sepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { useCallback } from "react";
-import { useWallets } from "@privy-io/react-auth";
+
 
 export function useSellFromBondingCurve() {
   const publicClient = usePublicClient();
   const { writeContractAsync, ...rest } = useWriteContract();
 
-  const { wallets } = useWallets();
-
-  const activeWallet = wallets?.[0];
-
-  const walletChainId = activeWallet?.chainId
-    ? Number(activeWallet.chainId.split(":")[1])
-    : NaN;
 
   const sellFromBondingCurve = useCallback(
     async (params: {
@@ -52,6 +45,10 @@ export function useSellFromBondingCurve() {
         hash: txid,
         confirmations: 1,
       });
+
+      if (receipt.status !== "success") {
+        throw new Error("Transaction failed: " + receipt.status);
+      }
 
       return { txid, receipt };
     },

@@ -51,6 +51,10 @@ export function useBuyFromBondingCurve() {
       confirmations: 1,
     });
 
+    if (receipt.status !== "success") {
+      throw new Error("Transaction failed: " + receipt.status);
+    }
+
     return { txid, receipt };
   }, [writeContractAsync, publicClient]);
 
