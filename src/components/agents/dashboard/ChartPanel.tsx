@@ -164,6 +164,7 @@ const chartConfig = {
 interface ChartPanelProps {
   bondingCurveData: {
     tokenAddress?: `0x${string}`;
+    tokenSymbol: string;
     marketCap: string;
     change1d: string;
     ath: string;
@@ -396,7 +397,7 @@ export function ChartPanel({
                   <div>Account</div>
                   <div>Type</div>
                   <div>Amount (GAIA)</div>
-                  <div>Amount (to)</div>
+                  <div>Amount ({bondingCurveData?.tokenSymbol})</div>
                   <div>Time</div>
                   <div>Txn</div>
                 </div>
@@ -431,6 +432,7 @@ export function ChartPanel({
                           <Link
                             href={`https://sepolia.etherscan.io/address/${transaction.user}`}
                             target="_blank"
+                            className="hover:text-primary"
                           >
                             {shortenTokenAddress(transaction?.user)}
                           </Link>
@@ -459,14 +461,15 @@ export function ChartPanel({
                           )}
                         </div>
                         <div>{timeAgo}</div>
-                        <div className="font-mono inline-flex items-center gap-2">
+                        <div className="font-mono flex items-center gap-2">
                           <Link
                             href={`https://sepolia.etherscan.io/tx/${transaction.transactionHash}`}
                             target="_blank"
+                            className="flex-1 hover:text-primary"
                           >
                             {transactionHashShort}
                           </Link>
-                          <ExternalLink className="h-4 w-4 text-neutral-400" />
+                          {/* <ExternalLink size={16} width={16} height={16} className="flex-1 h-4 w-4 text-neutral-400" /> */}
                         </div>
                       </div>
                     );

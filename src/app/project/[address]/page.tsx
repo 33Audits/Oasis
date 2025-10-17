@@ -9,7 +9,6 @@ import {
 } from "@/components/agents/dashboard";
 import { useTokenDetails } from "@/hooks/useTokenDetails";
 
-// Mock data for the agent (keeping dummy marketCap and other data)
 const getAgentData = (bondingCurveAddress: `0x${string}`, tokenName?: string, tokenSymbol?: string, issuanceTokenAddress?: string) => (
   {
   bondingCurveAddress: bondingCurveAddress,
@@ -75,7 +74,7 @@ export default function AgentDashboard({ params }: { params: Promise<{ address: 
         <AgentSummary bondingCurveData={bondingCurveData} />
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-          <ChartPanel bondingCurveData={bondingCurveData} fundingManagerAddress={resolvedParams.address as `0x${string}`} />
+          <ChartPanel bondingCurveData={{ ...bondingCurveData, tokenSymbol: tokenDetails?.symbol || "" }} fundingManagerAddress={resolvedParams.address as `0x${string}`} />
           <div className="space-y-4 md:space-y-6">
             <TradingPanel agentData={bondingCurveData} bondingCurveAddress={resolvedParams.address as `0x${string}`} issuanceToken={tokenDetails?.address as `0x${string}`} />
             <TopHolders holders={bondingCurveData.holders} topHolders={bondingCurveData.topHolders} />
