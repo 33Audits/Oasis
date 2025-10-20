@@ -30,3 +30,32 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 export function shortenTokenAddress(address: `0x${string}`) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
+
+// Format large numbers into human-readable compact form (e.g. 1.2K, 3.4M, 5B).
+// Falls back to plain string if Intl API unsupported.
+export function formatCompactNumber(value: number, maximumFractionDigits = 2): string {
+  if (isNaN(value)) return "-";
+
+  try {
+    return new Intl.NumberFormat("en-US", {
+      notation: "compact",
+      maximumFractionDigits,
+    }).format(value);
+  } catch {
+    // Fallback: manual formatting
+    const abs = Math.abs(value);
+    const sign = value < 0 ? "-" : "";
+    const units: [number, string][] = [
+      [1e12, "T"],
+      [1e9, "B"],
+      [1e6, "M"],
+      [1e3, "K"],
+    ];
+    for (const [divisor, suffix] of units) {
+      if (abs >= divisor) {
+        return `${sign}${(abs / divisor).toFixed(maximumFractionDigits)}${suffix}`;
+      }
+    }
+    return value.toString();
+  }
+}

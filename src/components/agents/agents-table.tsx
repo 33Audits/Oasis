@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, formatCompactNumber } from "@/lib/utils";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -156,7 +156,9 @@ function AgentsTable() {
                   )}
                   {visibleColumns.includes("Market Cap") && (
                     <TableCell className="whitespace-nowrap text-neutral-300">
-                      {0}
+                      {token.marketCap !== null && token.marketCap !== undefined
+                        ? `$${formatCompactNumber(token.marketCap, 2)}`
+                        : "-"}
                     </TableCell>
                   )}
                   {visibleColumns.includes("1d change") && (

@@ -6,6 +6,7 @@ import { sepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { wagmiConfig } from "@/providers/wagmiConfig";
+import { calcMarketCapNumber } from "@/lib/marketCap";
 
 export interface BondingCurveDetails {
   id?: number;
@@ -17,6 +18,8 @@ export interface BondingCurveDetails {
     symbol: string;
     decimals: number;
   };
+  /** Calculated market capitalization for the issuance token */
+  marketCap?: number | null;
 }
 
 export function useBondingCurveDetails() {
@@ -123,6 +126,64 @@ export function useBondingCurveDetails() {
     },
   });
 
+  // get token total supply
+  const tokenSupplyQuery = useQuery({
+    queryKey: ["token-supply", tokenAddressesQuery.data ? Number(tokenAddressesQuery.data) : null],
+    enabled: !!tokenAddressesQuery.data,
+    queryFn: async () => {
+      const contracts = tokenAddressesQuery.data!
+        .map((result) => result.result as `0x${string}`)
+        .filter(Boolean)
+        .map((tokenAddress) => ({
+          address: tokenAddress,
+          abi: abis.ERC20Mint,
+          functionName: "totalSupply" as const,
+        }));
+
+      return readContracts(wagmiConfig, { contracts });
+    },
+  });
+
+  // get collateral balance and reserve ratio for each bonding curve
+  const bcMetricsQuery = useQuery({
+    queryKey: [
+      "bc-metrics",
+      fundingManagersQuery.data,
+    ],
+    enabled:
+      !!fundingManagersQuery.data,
+    queryFn: async () => {
+      const contracts: Array<{
+        address: `0x${string}`;
+        abi: typeof abis.FM_BC_Bancor_Gaia_v1;
+        functionName:
+          | "getVirtualCollateralSupply"
+          | "getReserveRatioForBuying"
+          | "getVirtualIssuanceSupply";
+      }> = [];
+
+      fundingManagersQuery.data!.forEach((result) => {
+        const fmAddress = result.result as `0x${string}`;
+        if (fmAddress) {
+          contracts.push(
+            {
+              address: fmAddress,
+              abi: abis.FM_BC_Bancor_Gaia_v1,
+              functionName: "getVirtualCollateralSupply",
+            },
+            {
+              address: fmAddress,
+              abi: abis.FM_BC_Bancor_Gaia_v1,
+              functionName: "getReserveRatioForBuying",
+            }
+          );
+        }
+      });
+
+      return readContracts(wagmiConfig, { contracts });
+    },
+  });
+
   // combine all data
   const detailsQuery = useQuery({
     queryKey: [
@@ -131,18 +192,32 @@ export function useBondingCurveDetails() {
       fundingManagersQuery.data,
       tokenAddressesQuery.data,
       tokenMetadataQuery.data,
+      tokenSupplyQuery.data
+        ? tokenSupplyQuery.data.map((r) =>
+            r?.result !== undefined ? (r.result as bigint).toString() : null
+          )
+        : null,
+      bcMetricsQuery.data
+        ? bcMetricsQuery.data.map((r) =>
+            r?.result !== undefined ? (r.result as bigint | number).toString() : null
+          )
+        : null,
     ],
     enabled: !!(
       addressesQuery.data &&
       fundingManagersQuery.data &&
       tokenAddressesQuery.data &&
-      tokenMetadataQuery.data
+      tokenMetadataQuery.data &&
+      tokenSupplyQuery.data &&
+      bcMetricsQuery.data
     ),
     queryFn: () => {
       const addresses = addressesQuery.data!;
       const fundingManagers = fundingManagersQuery.data!;
       const tokenAddresses = tokenAddressesQuery.data!;
       const tokenMetadata = tokenMetadataQuery.data!;
+      const tokenSupply = tokenSupplyQuery.data!;
+      const bcMetrics = bcMetricsQuery.data!;
 
       const detailsArray: BondingCurveDetails[] = [];
 
@@ -161,7 +236,23 @@ export function useBondingCurveDetails() {
           const symbolResult = tokenMetadata[metadataIndex + 1];
           const decimalsResult = tokenMetadata[metadataIndex + 2];
 
+          const collateralResult = bcMetrics[index * 2];
+          const crrResult = bcMetrics[index * 2 + 1];
+
           if (nameResult?.result && symbolResult?.result && decimalsResult?.result) {
+            // compute market cap if supply & collateral available
+            let marketCap: number | null = null;
+            try {
+              if (collateralResult?.result && crrResult?.result) {
+                const reserveBal = collateralResult.result as bigint; // wei
+                const reserveRatioPpm = BigInt(crrResult.result as number);
+
+                marketCap = calcMarketCapNumber(reserveBal, reserveRatioPpm);
+              }
+            } catch {
+              marketCap = null;
+            }
+
             detailsArray.push({
               id: index + 1,
               orchestratorAddress: address,
@@ -172,6 +263,7 @@ export function useBondingCurveDetails() {
                 symbol: symbolResult.result as string,
                 decimals: decimalsResult.result as number,
               },
+              marketCap,
             });
           }
         }
@@ -189,6 +281,8 @@ export function useBondingCurveDetails() {
       fundingManagersQuery.isLoading ||
       tokenAddressesQuery.isLoading ||
       tokenMetadataQuery.isLoading ||
+      tokenSupplyQuery.isLoading ||
+      bcMetricsQuery.isLoading ||
       detailsQuery.isLoading,
     error:
       countQuery.error ||
@@ -196,6 +290,8 @@ export function useBondingCurveDetails() {
       fundingManagersQuery.error ||
       tokenAddressesQuery.error ||
       tokenMetadataQuery.error ||
+      tokenSupplyQuery.error ||
+      bcMetricsQuery.error ||
       detailsQuery.error,
     refetch: () => {
       countQuery.refetch();
