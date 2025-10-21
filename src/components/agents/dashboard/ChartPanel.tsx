@@ -13,60 +13,16 @@ import {
 } from "@/components/ui/chart";
 import {
   ComposedChart,
-  Bar,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
-  Cell,
 } from "recharts";
 import Link from "next/link";
 import { useBondingCurveTransactions } from "@/hooks/useBondingCurveTransactions";
 import { formatEther } from "viem";
 import { useCandles, type AllCandles } from "@/hooks/useCandles";
 import React from "react";
-
-// Custom candlestick shape function for Recharts Bar
-const CandlestickShape = (props: any) => {
-  const { payload, x, y, width, height } = props;
-
-  if (
-    !payload ||
-    typeof x !== "number" ||
-    typeof y !== "number" ||
-    typeof width !== "number" ||
-    typeof height !== "number"
-  ) {
-    return <g />;
-  }
-
-  const { open, close, high, low } = payload;
-  const isPositive = close > open;
-
-  return (
-    <g>
-      {/* High-Low wick (thin vertical line) */}
-      <line
-        x1={x + width / 2}
-        y1={y}
-        x2={x + width / 2}
-        y2={y + height}
-        stroke={isPositive ? "#10b981" : "#ef4444"}
-        strokeWidth="1"
-      />
-      {/* Open-Close body (rectangle) */}
-      <rect
-        x={x + width * 0.25}
-        y={y}
-        width={width * 0.5}
-        height={Math.max(height, 2)}
-        fill={isPositive ? "#10b981" : "#ef4444"}
-        stroke={isPositive ? "#10b981" : "#ef4444"}
-        strokeWidth="0.5"
-      />
-    </g>
-  );
-};
-
 
 const chartConfig = {
   close: {
@@ -100,16 +56,16 @@ export function ChartPanel({
   bondingCurveData,
   fundingManagerAddress,
 }: ChartPanelProps) {
-  const TIMEFRAME_OPTIONS = ["1m", "1h", "1d"] as const;
+  const TIMEFRAME_OPTIONS = ["m", "h", "d"] as const;
   type Timeframe = (typeof TIMEFRAME_OPTIONS)[number];
   type CandlesKey = keyof AllCandles;
   const PERIOD_MAP: Record<Timeframe, CandlesKey> = {
-    "1m": "min1",
-    "1h": "hour1",
-    "1d": "day1",
+    "m": "min1",
+    "h": "hour1",
+    "d": "day1",
   } as const;
 
-  const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1h");
+  const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("h");
 
   const { data: allCandles, isLoading: candlesLoading } = useCandles(
     fundingManagerAddress
@@ -122,23 +78,44 @@ export function ChartPanel({
     const candles = allCandles[periodKey];
     if (!candles || candles.length === 0) return null;
 
-    // Filter to current day only for 1m and 1h timeframes
-    if (selectedTimeframe === "1m" || selectedTimeframe === "1h") {
-      const now = new Date();
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      
-      return candles.filter((candle) => {
-        // Parse the time field - it could be in various formats
-        const candleDate = new Date(candle.time);
-        return candleDate >= startOfToday;
-      });
-    }
-
     return candles;
   }, [allCandles, selectedTimeframe]);
 
   const { data: transactions, isLoading: transactionsLoading } =
     useBondingCurveTransactions(fundingManagerAddress);
+
+  // Determine line color based on price trend
+  const lineColor = React.useMemo(() => {
+    if (!candlestickData || candlestickData.length < 2) {
+      return "#10b981"; // default green
+    }
+    
+    const firstPrice = candlestickData[0].close;
+    const lastPrice = candlestickData[candlestickData.length - 1].close;
+    
+    // Green if price went up, red if down
+    return lastPrice >= firstPrice ? "#10b981" : "#ef4444";
+  }, [candlestickData]);
+
+  // Format X-axis labels based on timeframe
+  const formatXAxisTick = (value: number) => {
+    const date = new Date(value);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    if (selectedTimeframe === "m" || selectedTimeframe === "h") {
+      // For 1m and 1h, show date and time: "Oct 21 14:30"
+      const month = monthNames[date.getMonth()];
+      const day = date.getDate();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${month} ${day} ${hours}:${minutes}`;
+    } else {
+      // For 1d, just show the date: "Oct 21"
+      const month = monthNames[date.getMonth()];
+      const day = date.getDate();
+      return `${month} ${day}`;
+    }
+  };
 
   return (
     <div className="xl:col-span-2 space-y-6">
@@ -256,10 +233,11 @@ export function ChartPanel({
                     opacity={0.3}
                   />
                   <XAxis
-                    dataKey="time"
+                    dataKey="timestamp"
                     axisLine={false}
                     tickLine={false}
                     tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                    tickFormatter={formatXAxisTick}
                   />
                   <YAxis
                     axisLine={false}
@@ -271,7 +249,16 @@ export function ChartPanel({
                   <ChartTooltip
                     content={
                       <ChartTooltipContent
-                        labelFormatter={(value) => `Date: ${value}`}
+                        labelFormatter={(value) => {
+                          const date = new Date(Number(value));
+                          return `Date: ${date.toLocaleString('en-US', {
+                            month: 'short',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })}`;
+                        }}
                         formatter={(value, name, props) => {
                           if (name === "close") {
                             return [
@@ -285,37 +272,17 @@ export function ChartPanel({
                     }
                   />
 
-                  {/* Candlestick bars - using close price to position bars, custom shape renders OHLC */}
-                  <Bar dataKey="close" fill="#8884d8" shape={CandlestickShape}>
-                    {candlestickData.map((_entry: unknown, index: number) => (
-                      <Cell key={`cell-${index}`} />
-                    ))}
-                  </Bar>
+                  {/* Line chart using close price */}
+                  <Line 
+                    type="monotone"
+                    dataKey="close" 
+                    stroke={lineColor}
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </ComposedChart>
               </ChartContainer>
             )}
-          </div>
-
-          {/* Bottom Chart Controls */}
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2">
-              {["1D", "5D", "1M"].map((timeframe) => (
-                <Button
-                  key={timeframe}
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-neutral-400"
-                >
-                  {timeframe}
-                </Button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="log" className="rounded" />
-              <label htmlFor="log" className="text-xs text-neutral-400">
-                log
-              </label>
-            </div>
           </div>
         </CardContent>
       </Card>
