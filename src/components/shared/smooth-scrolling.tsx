@@ -55,7 +55,7 @@ export default function SmoothScrolling({
       const header = document.querySelector("header.sticky") as HTMLElement | null;
       const headerHeight = header ? header.offsetHeight : 0;
       const isMobile = typeof window !== "undefined" ? window.innerWidth < 640 : false;
-      const extraPadding = isMobile ? 16 : 0;
+      const extraPadding = isMobile ? 16 : 32;
       const dynamicOffset = -(headerHeight + extraPadding);
 
       lenisRef.current.scrollTo(target, {
@@ -77,8 +77,21 @@ export default function SmoothScrolling({
       }
     }
 
+    // Handle hash changes (for router.push with hash)
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash && hash.startsWith("#")) {
+        setTimeout(() => {
+          scrollToElement(hash);
+        }, 100);
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+
     return () => {
       delete (window as any).smoothScrollTo;
+      window.removeEventListener("hashchange", handleHashChange);
     };
   }, [disabled]);
 

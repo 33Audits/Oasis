@@ -244,7 +244,7 @@ export function ChartPanel({
                     tickLine={false}
                     tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                     domain={["dataMin - 0.5", "dataMax + 0.5"]}
-                    tickFormatter={(value: number) => value.toFixed(3)}
+                    tickFormatter={(value: number) => parseFloat(value.toFixed(6)).toString()}
                   />
                   <ChartTooltip
                     content={
@@ -262,7 +262,7 @@ export function ChartPanel({
                         formatter={(value, name, props) => {
                           if (name === "close") {
                             return [
-                              `$${Number(value).toFixed(2)}`,
+                              `$${parseFloat(Number(value).toFixed(6))}`,
                               "Close Price",
                             ];
                           }
@@ -358,14 +358,14 @@ export function ChartPanel({
                           {transaction.transactionType}
                         </div>
                         <div>
-                          {Number(
+                          {parseFloat(Number(
                             formatEther(transaction.paymentAmount)
-                          ).toFixed(3)}
+                          ).toFixed(6))}
                         </div>
                         <div>
-                          {Number(formatEther(transaction.tokenAmount)).toFixed(
-                            3
-                          )}
+                          {parseFloat(Number(formatEther(transaction.tokenAmount)).toFixed(
+                            6
+                          ))}
                         </div>
                         <div>{timeAgo}</div>
                         <div className="font-mono flex items-center gap-2">

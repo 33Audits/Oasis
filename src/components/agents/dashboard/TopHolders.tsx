@@ -51,7 +51,7 @@ export function TopHolders({ fundingManagerAddress }: TopHoldersProps) {
                   </div>
                 </div>
                 <span className="font-medium text-sm self-end sm:self-auto">
-                  {Number(formatEther(BigInt(holder.balance))).toFixed(2)}
+                  {parseFloat(Number(formatEther(BigInt(holder.balance))).toFixed(6))}
                 </span>
               </div>
             ))}

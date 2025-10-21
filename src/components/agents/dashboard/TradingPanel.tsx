@@ -15,6 +15,7 @@ import { useAccount } from "wagmi";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useSellFromBondingCurve } from "@/hooks/useSellFromBondingCurve";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface TradingPanelProps {
   agentData: {
@@ -37,6 +38,7 @@ export function TradingPanel({
   const [isSelling, setIsSelling] = useState(false);
 
   const { address } = useAccount();
+  const queryClient = useQueryClient();
   const { buyFromBondingCurve, isPending: isBuyingPending } =
     useBuyFromBondingCurve();
   const { sellFromBondingCurve, isPending: isSellingPending } =
@@ -94,6 +96,12 @@ export function TradingPanel({
         </div>
       );
 
+      // Refresh candles, transactions, market cap, and holders data
+      queryClient.invalidateQueries({ queryKey: ["candles", bondingCurveAddress] });
+      queryClient.invalidateQueries({ queryKey: ["bonding-curve-transactions", bondingCurveAddress] });
+      queryClient.invalidateQueries({ queryKey: ["market-cap", bondingCurveAddress] });
+      queryClient.invalidateQueries({ queryKey: ["token-holders", bondingCurveAddress] });
+
       // Reset buy amount to default
       setBuyAmount("1");
     } catch (error: any) {
@@ -135,6 +143,15 @@ export function TradingPanel({
           </Link>
         </div>
       );
+
+      // Refresh candles, transactions, market cap, and holders data
+      queryClient.invalidateQueries({ queryKey: ["candles", bondingCurveAddress] });
+      queryClient.invalidateQueries({ queryKey: ["bonding-curve-transactions", bondingCurveAddress] });
+      queryClient.invalidateQueries({ queryKey: ["market-cap", bondingCurveAddress] });
+      queryClient.invalidateQueries({ queryKey: ["token-holders", bondingCurveAddress] });
+
+      // Reset sell amount to default
+      setSellAmount("0");
     } catch (error: any) {
       console.error("Sell transaction failed:", error);
       toast.error(error.message || "Sell transaction failed");

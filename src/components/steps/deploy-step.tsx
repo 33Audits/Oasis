@@ -95,7 +95,7 @@ export function DeployStep() {
       setIsDeploying(false);
       resetForm();
 
-      router.push(`/#agents`);
+      router.push(`/#bonding-curves`);
 
       console.log("Bonding curve created successfully:", result);
     } catch (err) {
