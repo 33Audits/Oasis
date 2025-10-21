@@ -37,6 +37,13 @@ export function TradingPanel({
   const [isBuying, setIsBuying] = useState(false);
   const [isSelling, setIsSelling] = useState(false);
 
+  // Input validation function
+  const isValidAmount = (amount: string): boolean => {
+    if (!amount || amount.trim() === '') return false;
+    const num = Number(amount);
+    return !isNaN(num) && num > 0 && num <= Number.MAX_SAFE_INTEGER;
+  };
+
   const { address } = useAccount();
   const queryClient = useQueryClient();
   const { buyFromBondingCurve, isPending: isBuyingPending } =
@@ -48,10 +55,10 @@ export function TradingPanel({
     address: bondingCurveAddress,
     abi: abis.FM_BC_Bancor_Gaia_v1,
     functionName: "calculatePurchaseReturn",
-    args: buyAmount ? [parseEther(buyAmount)] : undefined,
+    args: buyAmount && isValidAmount(buyAmount) ? [parseEther(buyAmount)] : undefined,
     query: {
       enabled:
-        !!bondingCurveAddress && !!buyAmount && !isNaN(Number(buyAmount)),
+        !!bondingCurveAddress && !!buyAmount && isValidAmount(buyAmount),
     },
   });
 
@@ -59,16 +66,21 @@ export function TradingPanel({
     address: bondingCurveAddress,
     abi: abis.FM_BC_Bancor_Gaia_v1,
     functionName: "calculateSaleReturn",
-    args: sellAmount ? [parseEther(sellAmount)] : undefined,
+    args: sellAmount && isValidAmount(sellAmount) ? [parseEther(sellAmount)] : undefined,
     query: {
       enabled:
-        !!bondingCurveAddress && !!sellAmount && !isNaN(Number(sellAmount)),
+        !!bondingCurveAddress && !!sellAmount && isValidAmount(sellAmount),
     },
   });
 
   const handleBuy = async () => {
     if (!bondingCurveAddress || !address || !purchaseReturn) {
       toast.error("Missing required data for purchase");
+      return;
+    }
+
+    if (!isValidAmount(buyAmount)) {
+      toast.error("Please enter a valid amount");
       return;
     }
 
@@ -115,6 +127,11 @@ export function TradingPanel({
   const handleSell = async () => {
     if (!bondingCurveAddress || !address || !sellAmount) {
       toast.error("Missing required data for sell");
+      return;
+    }
+
+    if (!isValidAmount(sellAmount)) {
+      toast.error("Please enter a valid amount");
       return;
     }
 
@@ -203,8 +220,9 @@ export function TradingPanel({
                 <Input
                   value={buyAmount}
                   onChange={(e) => setBuyAmount(e.target.value)}
+                  type="number"
                   placeholder="0.0"
-                  className="text-lg md:text-xl h-12 md:h-14 pl-4 pr-12 md:pr-16 border-2 focus:border-green-500 transition-colors"
+                  className="text-lg md:text-xl h-12 md:h-14 pl-4 pr-12 md:pr-16 border-2 focus:border-green-500 transition-colors [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                 />
                 <div className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 text-xs md:text-sm text-neutral-400 font-medium">
                   GAIA
@@ -283,8 +301,9 @@ export function TradingPanel({
                 <Input
                   value={sellAmount}
                   onChange={(e) => setSellAmount(e.target.value)}
+                  type="number"
                   placeholder="0.0"
-                  className="text-lg md:text-xl h-12 md:h-14 pl-4 pr-12 md:pr-16 border-2 focus:border-orange-500 transition-colors"
+                  className="text-lg md:text-xl h-12 md:h-14 pl-4 pr-12 md:pr-16 border-2 focus:border-orange-500 transition-colors [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                 />
                 <div className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 text-xs md:text-sm text-neutral-400 font-medium">
                   {agentData.symbol}
