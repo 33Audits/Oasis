@@ -1,12 +1,10 @@
-//TODO: Separate the chart panel into a separate component and use the same data for the chart and the trades table.
-
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn, shortenTokenAddress } from "@/lib/utils";
+import { cn, formatCompactNumber, shortenTokenAddress } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
 import {
   ChartContainer,
@@ -24,74 +22,13 @@ import {
 import Link from "next/link";
 import { useBondingCurveTransactions } from "@/hooks/useBondingCurveTransactions";
 import { formatEther } from "viem";
-
-const candlestickData = [
-  { time: "00:00", open: 34, high: 41, low: 29, close: 38, volume: 2340000 },
-  { time: "01:00", open: 38, high: 45, low: 35, close: 42, volume: 1980000 },
-  { time: "02:00", open: 42, high: 48, low: 38, close: 39, volume: 1750000 },
-  { time: "03:00", open: 39, high: 43, low: 31, close: 33, volume: 2120000 },
-  { time: "04:00", open: 33, high: 37, low: 25, close: 27, volume: 2890000 },
-  { time: "05:00", open: 27, high: 35, low: 23, close: 32, volume: 3120000 },
-  { time: "06:00", open: 32, high: 51, low: 30, close: 48, volume: 4560000 },
-  { time: "07:00", open: 48, high: 67, low: 46, close: 63, volume: 5780000 },
-  { time: "08:00", open: 63, high: 78, low: 59, close: 71, volume: 6230000 },
-  { time: "09:00", open: 71, high: 82, low: 65, close: 68, volume: 5140000 },
-  { time: "10:00", open: 68, high: 75, low: 61, close: 73, volume: 4890000 },
-  { time: "11:00", open: 73, high: 89, low: 70, close: 85, volume: 7120000 },
-  { time: "12:00", open: 85, high: 93, low: 79, close: 81, volume: 5560000 },
-  { time: "13:00", open: 81, high: 87, low: 72, close: 75, volume: 4320000 },
-  { time: "14:00", open: 75, high: 83, low: 68, close: 79, volume: 3980000 },
-  { time: "15:00", open: 79, high: 94, low: 77, close: 91, volume: 6450000 },
-  { time: "16:00", open: 91, high: 98, low: 86, close: 95, volume: 5890000 },
-  { time: "17:00", open: 95, high: 105, low: 90, close: 102, volume: 7230000 },
-  { time: "18:00", open: 102, high: 112, low: 98, close: 108, volume: 8120000 },
-  {
-    time: "19:00",
-    open: 108,
-    high: 118,
-    low: 104,
-    close: 114,
-    volume: 6780000,
-  },
-  {
-    time: "20:00",
-    open: 114,
-    high: 121,
-    low: 107,
-    close: 109,
-    volume: 5640000,
-  },
-  {
-    time: "21:00",
-    open: 109,
-    high: 116,
-    low: 101,
-    close: 112,
-    volume: 4920000,
-  },
-  {
-    time: "22:00",
-    open: 112,
-    high: 125,
-    low: 110,
-    close: 122,
-    volume: 7890000,
-  },
-  {
-    time: "23:00",
-    open: 122,
-    high: 129,
-    low: 118,
-    close: 126,
-    volume: 6340000,
-  },
-];
+import { useCandles, type AllCandles } from "@/hooks/useCandles";
+import React from "react";
 
 // Custom candlestick shape function for Recharts Bar
 const CandlestickShape = (props: any) => {
   const { payload, x, y, width, height } = props;
 
-  // Early return if no payload or missing data
   if (
     !payload ||
     typeof x !== "number" ||
@@ -105,42 +42,23 @@ const CandlestickShape = (props: any) => {
   const { open, close, high, low } = payload;
   const isPositive = close > open;
 
-  // Calculate price range for the entire dataset
-  const allHighs = candlestickData.map((d) => d.high);
-  const allLows = candlestickData.map((d) => d.low);
-  const dataMax = Math.max(...allHighs);
-  const dataMin = Math.min(...allLows);
-  const dataRange = dataMax - dataMin;
-
-  if (dataRange === 0) return <g />;
-
-  // Scale factor: how much chart height corresponds to the data range
-  const scale = height / dataRange;
-
-  // Calculate Y positions relative to the chart's Y coordinate system
-  // Y increases downward in SVG, so we need to flip the calculation
-  const wickTop = y + (dataMax - high) * scale;
-  const wickBottom = y + (dataMax - low) * scale;
-  const bodyTop = y + (dataMax - Math.max(open, close)) * scale;
-  const bodyHeight = Math.abs(close - open) * scale;
-
   return (
     <g>
       {/* High-Low wick (thin vertical line) */}
       <line
         x1={x + width / 2}
-        y1={wickTop}
+        y1={y}
         x2={x + width / 2}
-        y2={wickBottom}
+        y2={y + height}
         stroke={isPositive ? "#10b981" : "#ef4444"}
         strokeWidth="1"
       />
       {/* Open-Close body (rectangle) */}
       <rect
         x={x + width * 0.25}
-        y={bodyTop}
+        y={y}
         width={width * 0.5}
-        height={Math.max(bodyHeight, 2)}
+        height={Math.max(height, 2)}
         fill={isPositive ? "#10b981" : "#ef4444"}
         stroke={isPositive ? "#10b981" : "#ef4444"}
         strokeWidth="0.5"
@@ -149,7 +67,7 @@ const CandlestickShape = (props: any) => {
   );
 };
 
-// Chart configuration
+
 const chartConfig = {
   close: {
     label: "Close Price",
@@ -165,9 +83,7 @@ interface ChartPanelProps {
   bondingCurveData: {
     tokenAddress?: `0x${string}`;
     tokenSymbol: string;
-    marketCap: string;
-    change1d: string;
-    ath: string;
+    marketCap: number;
     trades: Array<{
       account: string;
       type: string;
@@ -184,9 +100,30 @@ export function ChartPanel({
   bondingCurveData,
   fundingManagerAddress,
 }: ChartPanelProps) {
-  const [selectedTimeframe, setSelectedTimeframe] = useState("24h");
+  const TIMEFRAME_OPTIONS = ["1m", "1h", "1d"] as const;
+  type Timeframe = (typeof TIMEFRAME_OPTIONS)[number];
+  type CandlesKey = keyof AllCandles;
+  const PERIOD_MAP: Record<Timeframe, CandlesKey> = {
+    "1m": "min1",
+    "1h": "hour1",
+    "1d": "day1",
+  } as const;
 
-  // Fetch real transaction data from GraphQL API
+  const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1h");
+
+  const { data: allCandles, isLoading: candlesLoading } = useCandles(
+    fundingManagerAddress
+  );
+
+  const candlestickData = React.useMemo(() => {
+    if (!allCandles) return null;
+
+    const periodKey: CandlesKey = PERIOD_MAP[selectedTimeframe];
+    const candles = allCandles[periodKey];
+    if (!candles || candles.length === 0) return null;
+    return candles;
+  }, [allCandles, selectedTimeframe]);
+
   const { data: transactions, isLoading: transactionsLoading } =
     useBondingCurveTransactions(fundingManagerAddress);
 
@@ -225,16 +162,7 @@ export function ChartPanel({
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-foreground">
-                Market Cap {bondingCurveData.marketCap}
-              </div>
-              <div className="text-green-400 font-medium">
-                +$1.14M ({bondingCurveData.change1d}) 24hr
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-neutral-400">ATH</div>
-              <div className="text-lg font-medium text-foreground">
-                {bondingCurveData.ath}
+                Market Cap {formatCompactNumber(bondingCurveData.marketCap)}
               </div>
             </div>
           </div>
@@ -242,14 +170,14 @@ export function ChartPanel({
           {/* Chart Controls */}
           <div className="flex flex-wrap items-center md:gap-4">
             <div className="flex gap-2">
-              {["24h", "1D", "5D", "1M"].map((timeframe) => (
+              {TIMEFRAME_OPTIONS.map((timeframe) => (
                 <Button
                   key={timeframe}
                   variant={
                     selectedTimeframe === timeframe ? "default" : "ghost"
                   }
                   size="sm"
-                  onClick={() => setSelectedTimeframe(timeframe)}
+                  onClick={() => setSelectedTimeframe(timeframe as Timeframe)}
                   className={cn(
                     "text-xs",
                     selectedTimeframe === timeframe
@@ -257,7 +185,7 @@ export function ChartPanel({
                       : "text-neutral-400 hover:text-foreground"
                   )}
                 >
-                  {timeframe}
+                  {timeframe.toUpperCase()}
                 </Button>
               ))}
             </div>
@@ -292,67 +220,67 @@ export function ChartPanel({
 
           {/* Candlestick Chart */}
           <div className="h-80 w-full">
-            <ChartContainer config={chartConfig} className="h-full w-full">
-              <ComposedChart
-                data={candlestickData}
-                margin={{ top: 20, right: 60, left: 20, bottom: 20 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
-                  opacity={0.3}
-                />
-                <XAxis
-                  dataKey="time"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                  domain={["dataMin - 0.5", "dataMax + 0.5"]}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      labelFormatter={(value) => `Date: ${value}`}
-                      formatter={(value, name, props) => {
-                        if (name === "close") {
-                          return [
-                            `$${Number(value).toFixed(2)}`,
-                            "Close Price",
-                          ];
-                        }
-                        return [value, name];
-                      }}
-                    />
-                  }
-                />
+            {candlesLoading ? (
+              <div className="h-full w-full flex items-center justify-center text-neutral-400">
+                Loading chart...
+              </div>
+            ) : !candlestickData ? (
+              <div className="h-full w-full flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-neutral-400 text-lg">Chart not available</p>
+                  <p className="text-neutral-500 text-sm mt-2">No candle data found for this bonding curve</p>
+                </div>
+              </div>
+            ) : (
+              <ChartContainer config={chartConfig} className="h-full w-full">
+                <ComposedChart
+                  data={candlestickData}
+                  margin={{ top: 20, right: 60, left: 20, bottom: 20 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                    opacity={0.3}
+                  />
+                  <XAxis
+                    dataKey="time"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    domain={["dataMin - 0.5", "dataMax + 0.5"]}
+                    tickFormatter={(value: number) => value.toFixed(3)}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(value) => `Date: ${value}`}
+                        formatter={(value, name, props) => {
+                          if (name === "close") {
+                            return [
+                              `$${Number(value).toFixed(2)}`,
+                              "Close Price",
+                            ];
+                          }
+                          return [value, name];
+                        }}
+                      />
+                    }
+                  />
 
-                {/* Candlestick bars - using close price to position bars, custom shape renders OHLC */}
-                <Bar dataKey="close" fill="#8884d8" shape={CandlestickShape}>
-                  {candlestickData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} />
-                  ))}
-                </Bar>
-              </ComposedChart>
-            </ChartContainer>
-
-            {/* Chart info overlay */}
-            <div className="absolute top-4 left-4 text-xs text-neutral-400 pointer-events-none">
-              <div>Aug 14 - Aug 25 UTC</div>
-            </div>
-
-            {/* Price indicators */}
-            <div className="absolute top-4 right-4 text-xs text-right pointer-events-none">
-              <div className="text-green-400">4.7</div>
-              <div className="text-neutral-400">4.0</div>
-              <div className="text-neutral-400">3.3</div>
-              <div className="text-neutral-400">2.6</div>
-              <div className="text-red-400">2.0</div>
-            </div>
+                  {/* Candlestick bars - using close price to position bars, custom shape renders OHLC */}
+                  <Bar dataKey="close" fill="#8884d8" shape={CandlestickShape}>
+                    {candlestickData.map((_entry: unknown, index: number) => (
+                      <Cell key={`cell-${index}`} />
+                    ))}
+                  </Bar>
+                </ComposedChart>
+              </ChartContainer>
+            )}
           </div>
 
           {/* Bottom Chart Controls */}

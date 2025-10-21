@@ -7,6 +7,7 @@ import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { wagmiConfig } from "@/providers/wagmiConfig";
 import { calcMarketCapNumber } from "@/lib/marketCap";
+import { setBondingCurves } from "@/lib/store";
 
 export interface BondingCurveDetails {
   id?: number;
@@ -18,7 +19,6 @@ export interface BondingCurveDetails {
     symbol: string;
     decimals: number;
   };
-  /** Calculated market capitalization for the issuance token */
   marketCap?: number | null;
 }
 
@@ -268,6 +268,8 @@ export function useBondingCurveDetails() {
           }
         }
       });
+
+      setBondingCurves(detailsArray);
 
       return detailsArray;
     },

@@ -32,7 +32,6 @@ export function shortenTokenAddress(address: `0x${string}`) {
 }
 
 // Format large numbers into human-readable compact form (e.g. 1.2K, 3.4M, 5B).
-// Falls back to plain string if Intl API unsupported.
 export function formatCompactNumber(value: number, maximumFractionDigits = 2): string {
   if (isNaN(value)) return "-";
 
@@ -42,7 +41,6 @@ export function formatCompactNumber(value: number, maximumFractionDigits = 2): s
       maximumFractionDigits,
     }).format(value);
   } catch {
-    // Fallback: manual formatting
     const abs = Math.abs(value);
     const sign = value < 0 ? "-" : "";
     const units: [number, string][] = [
