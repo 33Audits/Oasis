@@ -94,7 +94,7 @@ export const useBondingCurveStore = create<BondingCurveStore>()(
 
           return {
             state: {
-              formData: sessionData.state?.formData || {},
+              formData: { ...initialFormData, ...(sessionData.state?.formData || {}) },
               currentStep: sessionData.state?.currentStep || 1,
               curves: localData.state?.curves || {},
             },

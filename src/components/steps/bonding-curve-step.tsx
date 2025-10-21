@@ -82,11 +82,11 @@ export function BondingCurveStep() {
                 <Input
                   id="initialIssuanceSupply"
                   placeholder="e.g. 1000000"
-                  value={formatUnits(BigInt(formData.initialIssuanceSupply), 18)}
+                  value={formData.initialIssuanceSupply ? formatUnits(BigInt(formData.initialIssuanceSupply), 18) : ""}
                   onChange={(e) => handleInputChange("initialIssuanceSupply", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
-                <p className="text-xs text-neutral-400">Initial supply of tokens available for trading (automatically converted to 18 decimals)</p>
+                <p className="text-xs text-neutral-400">Initial supply of tokens available for trading</p>
               </div>
 
               <div className="space-y-2">
@@ -96,11 +96,11 @@ export function BondingCurveStep() {
                 <Input
                   id="initialCollateralSupply"
                   placeholder="e.g. 1000000"
-                  value={formatUnits(BigInt(formData.initialCollateralSupply), 18)}
+                  value={formData.initialCollateralSupply ? formatUnits(BigInt(formData.initialCollateralSupply), 18) : ""}
                   onChange={(e) => handleInputChange("initialCollateralSupply", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
-                <p className="text-xs text-neutral-400">Initial collateral backing the bonding curve (automatically converted to 18 decimals)</p>
+                <p className="text-xs text-neutral-400">Initial collateral backing the bonding curve</p>
               </div>
             </CardContent>
           </AnimatedCard>

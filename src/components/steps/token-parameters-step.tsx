@@ -46,7 +46,7 @@ export function TokenParametersStep() {
                 <Input
                   id="name"
                   placeholder="e.g. My Awesome Token"
-                  value={formData.name}
+                  value={formData.name || ""}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
@@ -59,7 +59,7 @@ export function TokenParametersStep() {
                 <Input
                   id="symbol"
                   placeholder="e.g. MAT"
-                  value={formData.symbol}
+                  value={formData.symbol || ""}
                   onChange={(e) => handleInputChange("symbol", e.target.value.toUpperCase())}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
@@ -88,12 +88,12 @@ export function TokenParametersStep() {
                 <Input
                   id="maxSupply"
                   placeholder="e.g. 1000000"
-                  value={formatUnits(BigInt(formData.maxSupply), 18)}
+                  value={formData.maxSupply ? formatUnits(BigInt(formData.maxSupply), 18) : ""}
                   onChange={(e) => handleInputChange("maxSupply", e.target.value)}
                   className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                 />
                 <p className="text-xs text-neutral-400">
-                  Maximum token supply (automatically converted to 18 decimals)
+                  Maximum token supply
                 </p>
               </div>
             </CardContent>
@@ -128,7 +128,7 @@ export function TokenParametersStep() {
                   <div className="space-y-1 text-sm text-neutral-400">
                     <p>Decimals: {formData.decimals}</p>
                     {formData.maxSupply && (
-                      <p>Max Supply: {formData.maxSupply ? formatUnits(BigInt(formData.maxSupply), 18) : "Not set"}</p>
+                      <p>Max Supply: {formatUnits(BigInt(formData.maxSupply), 18)}</p>
                     )}
                   </div>
                 </div>
