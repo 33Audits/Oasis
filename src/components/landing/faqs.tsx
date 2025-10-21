@@ -12,34 +12,34 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    id: "what-are-ai-agents",
-    question: "What are AI Trading Agents?",
-    answer: "AI Trading Agents are autonomous programs that execute trading strategies on your behalf. They can analyze market data, make trading decisions, and manage risk according to your predefined parameters."
+    id: "what-is-bonding-curve",
+    question: "What is a bonding curve?",
+    answer: "A bonding curve is a smart contract that automatically prices tokens based on supply and demand. As more tokens are minted, the price increases along a predetermined curve, creating transparent and predictable pricing for funding your onchain strategies."
   },
   {
-    id: "how-to-create",
-    question: "How do I create my own trading agent?",
-    answer: "Creating an agent is simple: choose from pre-built strategies, customize parameters like risk tolerance and trading pairs, configure your vault settings, and deploy on-chain. Our step-by-step wizard guides you through the entire process."
+    id: "how-to-deploy",
+    question: "How do I deploy a bonding curve?",
+    answer: "Deploying is simple: configure your token parameters, set your bonding curve formula (reserve ratio, initial supply), define vault settings for fund management, and deploy on-chain. Our step-by-step wizard guides you through the entire process."
   },
   {
     id: "security",
-    question: "How secure are the trading agents?",
-    answer: "All agents run on-chain with transparent smart contracts. Your funds remain in your control through tokenized ownership, and agents can only execute trades within your predefined risk parameters."
+    question: "How secure are bonding curves?",
+    answer: "All bonding curves run on transparent smart contracts with audited code. Funds are managed through secure vault mechanisms, and token holders have proportional ownership rights. The pricing formula is immutable and verifiable on-chain."
   },
   {
-    id: "custom-strategies",
-    question: "Can I create custom trading strategies?",
-    answer: "Yes! Advanced users can deploy custom strategies through our developer tools. We provide templates, documentation, and support for creating sophisticated trading algorithms."
+    id: "funding-strategies",
+    question: "What can I use bonding curves to fund?",
+    answer: "Bonding curves can fund any onchain strategy or protocol. Common uses include DeFi protocols, trading strategies, DAOs, public goods funding, or any project requiring transparent, community-driven capital formation."
   },
   {
-    id: "risk-management",
-    question: "What risk management features are available?",
-    answer: "Built-in stop-loss orders, position size limits, maximum drawdown controls, and portfolio diversification rules. You can customize all risk parameters before deployment."
+    id: "curve-parameters",
+    question: "What parameters can I customize?",
+    answer: "You can customize token name and symbol, initial supply, maximum supply, reserve ratios for buying and selling, vault configurations, and fee structures. Each parameter affects how your bonding curve behaves and funds your strategy."
   },
   {
     id: "performance-monitoring",
-    question: "How can I monitor my agent's performance?",
-    answer: "Real-time dashboards show trading activity, P&L, risk metrics, and strategy effectiveness. You can pause, modify, or terminate agents at any time through the interface."
+    question: "How can I monitor my bonding curve?",
+    answer: "Real-time dashboards show token price, market cap, trading volume, holder distribution, and fund flows. You can track all transactions, view price charts, and analyze your bonding curve's performance through detailed analytics."
   }
 ];
 
@@ -64,7 +64,7 @@ export default function FAQs() {
             Frequently Asked Questions
           </h2>
           <p className="text-xl text-white/70 font-light max-w-2xl mx-auto">
-            Everything you need to know about AI trading agents
+            Everything you need to know about bonding curves and strategy funding
           </p>
         </div>
 

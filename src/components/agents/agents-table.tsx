@@ -19,14 +19,10 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useBondingCurveDetails } from "@/hooks/useBondingCurveDetails";
 
 const allColumns = [
-  "Agent",
+  "Token",
   "Symbol",
-  "Tags",
   "Market Cap",
-  "1d change",
   "Holders",
-  "AUM",
-  "Returns",
 ] as const;
 
 function AgentsTable() {
@@ -41,14 +37,14 @@ function AgentsTable() {
   const router = useRouter();
   const { authenticated: isAuthenticated } = usePrivy();
 
-  const filteredData = details.filter((agent) => {
+  const filteredData = details.filter((curve) => {
     if (!searchFilter) return true;
 
     const searchLower = searchFilter.toLowerCase();
 
     return (
-      agent.issuanceToken.name.toLowerCase().includes(searchLower) ||
-      agent.issuanceToken.symbol.toLowerCase().includes(searchLower)
+      curve.issuanceToken.name.toLowerCase().includes(searchLower) ||
+      curve.issuanceToken.symbol.toLowerCase().includes(searchLower)
     );
   });
 
@@ -61,10 +57,10 @@ function AgentsTable() {
   return (
     <div className="max-w-7xl mx-auto w-full container space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
       <div className="flex flex-wrap gap-4 items-center justify-between mb-12">
-        <h2 className="text-3xl md:text-5xl font-normal text-white">Agents</h2>
+        <h2 className="text-3xl md:text-5xl font-normal text-white">Bonding Curves</h2>
         <div className="flex gap-2 md:gap-3">
           <Input
-            placeholder="Search agents, symbols, or tags..."
+            placeholder="Search tokens or symbols..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             className="w-full md:w-64 bg-neutral-800 border-neutral-600 text-white placeholder:text-neutral-400"
@@ -72,8 +68,7 @@ function AgentsTable() {
           {isAuthenticated && (
             <Link href="/create">
               <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-                <span className="sm:hidden">Create +</span>
-                <span className="hidden sm:inline">Create Agent</span>
+                <span className="">Deploy</span>
               </Button>
             </Link>
           )}
@@ -84,9 +79,9 @@ function AgentsTable() {
         <Table className="w-full">
           <TableHeader>
             <TableRow className="border-neutral-700">
-              {visibleColumns.includes("Agent") && (
+              {visibleColumns.includes("Token") && (
                 <TableHead className="w-[200px] text-neutral-300">
-                  Agent
+                  Token
                 </TableHead>
               )}
               {visibleColumns.includes("Symbol") && (
@@ -99,24 +94,9 @@ function AgentsTable() {
                   Market Cap
                 </TableHead>
               )}
-              {visibleColumns.includes("1d change") && (
-                <TableHead className="w-[100px] text-neutral-300">
-                  1d change
-                </TableHead>
-              )}
               {visibleColumns.includes("Holders") && (
                 <TableHead className="w-[100px] text-neutral-300">
                   Holders
-                </TableHead>
-              )}
-              {visibleColumns.includes("AUM") && (
-                <TableHead className="w-[100px] text-neutral-300">
-                  AUM
-                </TableHead>
-              )}
-              {visibleColumns.includes("Returns") && (
-                <TableHead className="w-[100px] text-neutral-300">
-                  Returns
                 </TableHead>
               )}
             </TableRow>
@@ -131,7 +111,7 @@ function AgentsTable() {
                     router.push(`/project/${token.fundingManagerAddress}`)
                   }
                 >
-                  {visibleColumns.includes("Agent") && (
+                  {visibleColumns.includes("Token") && (
                     <TableCell className="font-medium whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
@@ -161,42 +141,9 @@ function AgentsTable() {
                         : "-"}
                     </TableCell>
                   )}
-                  {visibleColumns.includes("1d change") && (
-                    <TableCell className="whitespace-nowrap">
-                      <span
-                        className={cn(
-                          "font-medium",
-                          "0".startsWith("+")
-                            ? "text-green-400"
-                            : "text-red-400"
-                        )}
-                      >
-                        {0}
-                      </span>
-                    </TableCell>
-                  )}
                   {visibleColumns.includes("Holders") && (
                     <TableCell className="whitespace-nowrap text-neutral-300">
-                      {0}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("AUM") && (
-                    <TableCell className="whitespace-nowrap text-neutral-300">
-                      {0}
-                    </TableCell>
-                  )}
-                  {visibleColumns.includes("Returns") && (
-                    <TableCell className="whitespace-nowrap">
-                      <span
-                        className={cn(
-                          "font-medium",
-                          "0".startsWith("+")
-                            ? "text-green-400"
-                            : "text-red-400"
-                        )}
-                      >
-                        {0}
-                      </span>
+                      {token.holderCount ?? "-"}
                     </TableCell>
                   )}
                 </TableRow>

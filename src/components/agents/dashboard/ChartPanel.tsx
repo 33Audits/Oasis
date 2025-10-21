@@ -121,6 +121,19 @@ export function ChartPanel({
     const periodKey: CandlesKey = PERIOD_MAP[selectedTimeframe];
     const candles = allCandles[periodKey];
     if (!candles || candles.length === 0) return null;
+
+    // Filter to current day only for 1m and 1h timeframes
+    if (selectedTimeframe === "1m" || selectedTimeframe === "1h") {
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      return candles.filter((candle) => {
+        // Parse the time field - it could be in various formats
+        const candleDate = new Date(candle.time);
+        return candleDate >= startOfToday;
+      });
+    }
+
     return candles;
   }, [allCandles, selectedTimeframe]);
 
@@ -313,7 +326,6 @@ export function ChartPanel({
           <Tabs defaultValue="trades" className="w-full">
             <div className="flex items-center justify-between">
               <TabsList>
-                <TabsTrigger value="comments">Comments</TabsTrigger>
                 <TabsTrigger value="trades">Trades</TabsTrigger>
               </TabsList>
               <div className="text-sm text-neutral-400">Sort by: Newest</div>

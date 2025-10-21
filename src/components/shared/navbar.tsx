@@ -49,10 +49,10 @@ export default function Navbar() {
               Home
             </button>
             <button
-              onClick={() => handleNavigation("#agents", pathname, router)}
+              onClick={() => handleNavigation("#bonding-curves", pathname, router)}
               className="text-base text-foreground hover:text-foreground/80 cursor-pointer"
             >
-              Agents
+              Bonding Curves
             </button>
             <button
               onClick={() => handleNavigation("#faqs", pathname, router)}
@@ -67,7 +67,7 @@ export default function Navbar() {
             {isAuthenticated && (
             <Link href="/create" className="hidden md:block">
               <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-                Create Agent
+                Deploy
               </Button>
             </Link>
             )}
@@ -111,11 +111,11 @@ export default function Navbar() {
               <button
                 className="block w-full text-left text-base text-foreground hover:text-foreground/80"
                 onClick={() => {
-                  handleNavigation("#agents", pathname, router);
+                  handleNavigation("#bonding-curves", pathname, router);
                   setIsOpen(false);
                 }}
               >
-                Agents
+                Bonding Curves
               </button>
               <button
                 className="block w-full text-left text-base text-foreground hover:text-foreground/80"
@@ -132,7 +132,7 @@ export default function Navbar() {
               <div className="p-4">
                 <Link href="/create">
                   <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-                    Create Agent
+                    Deploy
                   </Button>
                 </Link>
               </div>

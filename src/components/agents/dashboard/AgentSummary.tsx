@@ -5,6 +5,8 @@ import { formatCompactNumber, shortenTokenAddress } from "@/lib/utils";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
+import { useTokenHolders } from "@/hooks/useTokenHolders";
+
 interface AgentSummaryProps {
   bondingCurveData: {
     bondingCurveAddress: `0x${string}`;
@@ -12,11 +14,11 @@ interface AgentSummaryProps {
     symbol: string;
     avatar: string;
     marketCap: number;
-    holders: string;
   };
 }
 
 export function AgentSummary({ bondingCurveData }: AgentSummaryProps) {
+  const { data: holdersData } = useTokenHolders(bondingCurveData.bondingCurveAddress);
   return (
     <div className="p-4 sm:p-6 bg-card border border-border rounded-xl">
       {/* Mobile layout */}
@@ -53,7 +55,7 @@ export function AgentSummary({ bondingCurveData }: AgentSummaryProps) {
           <div className="text-center">
             <span className="text-neutral-400 block">Holders: </span>
             <span className="text-foreground font-medium break-words">
-              {bondingCurveData.holders}
+              {holdersData?.holderCount ?? 0}
             </span>
           </div>
         </div>
@@ -100,7 +102,7 @@ export function AgentSummary({ bondingCurveData }: AgentSummaryProps) {
               <div>
                 <span className="text-neutral-400">Holders: </span>
                 <span className="text-foreground font-medium">
-                  {bondingCurveData.holders}
+                  {holdersData?.holderCount ?? 0}
                 </span>
               </div>
             </div>

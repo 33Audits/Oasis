@@ -24,7 +24,6 @@ const getAgentData = (
   avatar: "/33labs.jpg",
   tokenAddress: issuanceTokenAddress as `0x${string}`,
   marketCap: marketCap ?? 0,
-  holders: "0",
   trades: [] as Array<{
     account: string;
     type: string;
@@ -79,7 +78,7 @@ export default function AgentDashboard({ params }: { params: Promise<{ address: 
               bondingCurveAddress={resolvedParams.address as `0x${string}`} 
               issuanceToken={tokenInfo?.address as `0x${string}`} 
             />
-            <TopHolders holders={bondingCurveData.holders} topHolders={[]} />
+            <TopHolders fundingManagerAddress={resolvedParams.address as `0x${string}`} />
           </div>
         </div>
       </div>

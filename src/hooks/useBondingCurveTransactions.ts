@@ -15,7 +15,7 @@ interface BondingCurveTransaction {
 
 interface GraphQLResponse {
   data: {
-    bondingCurveTransactions: BondingCurveTransaction[];
+    transactions: BondingCurveTransaction[];
   };
 }
 
@@ -27,7 +27,7 @@ export function useBondingCurveTransactions(fundingManagerAddress: `0x${string}`
     queryFn: async (): Promise<BondingCurveTransaction[]> => {
       const query = `
         query GetBondingCurveTransactions($fundingManagerAddress: String!) {
-          bondingCurveTransactions(
+          transactions(
             where: { fundingManagerAddress: $fundingManagerAddress }
             first: 5
             orderBy: blockTimestamp
@@ -63,8 +63,8 @@ export function useBondingCurveTransactions(fundingManagerAddress: `0x${string}`
 
       const data: GraphQLResponse = await response.json();
 
-      if (data.data?.bondingCurveTransactions) {
-        return data.data.bondingCurveTransactions;
+      if (data.data?.transactions) {
+        return data.data.transactions;
       }
 
       return [];

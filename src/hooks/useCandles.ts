@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { GRAPHQL_URL } from "@/lib/constants";
 
 export interface Candle {
   timestamp: number;
@@ -20,8 +21,6 @@ export interface AllCandles {
  // retrieve 1-minute, 1-hour and 1-day candles for a FundingManager in one request.
  
 export function useCandles(fundingManagerAddress: `0x${string}` | undefined) {
-  const GRAPH_ENDPOINT =
-    "https://api.studio.thegraph.com/query/1685479/mosaic-subgraph/v0.0.12";
 
   return useQuery<AllCandles>({
     queryKey: ["candles", fundingManagerAddress],
@@ -71,7 +70,7 @@ export function useCandles(fundingManagerAddress: `0x${string}` | undefined) {
         }
       `;
 
-      const res = await fetch(GRAPH_ENDPOINT, {
+      const res = await fetch(GRAPHQL_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

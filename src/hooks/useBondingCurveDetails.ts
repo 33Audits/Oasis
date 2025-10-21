@@ -1,3 +1,5 @@
+//TODO: Break this into smaller hooks
+
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +10,7 @@ import { abis } from "@/lib/abis";
 import { wagmiConfig } from "@/providers/wagmiConfig";
 import { calcMarketCapNumber } from "@/lib/marketCap";
 import { setBondingCurves } from "@/lib/store";
+import { GRAPHQL_URL } from "@/lib/constants";
 
 export interface BondingCurveDetails {
   id?: number;
@@ -20,6 +23,7 @@ export interface BondingCurveDetails {
     decimals: number;
   };
   marketCap?: number | null;
+  holderCount?: number;
 }
 
 export function useBondingCurveDetails() {
@@ -184,6 +188,54 @@ export function useBondingCurveDetails() {
     },
   });
 
+  // fetch holderCount and allTimeHigh from GraphQL
+  const graphQLDataQuery = useQuery({
+    queryKey: ["bonding-curve-graphql-data"],
+    queryFn: async () => {
+      const query = `
+        query GetBondingCurveStats {
+          bondingCurves {
+            holderCount
+            fundingManagerAddress
+          }
+        }
+      `;
+
+      const response = await fetch(GRAPHQL_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`GraphQL request failed: ${response.statusText}`);
+      }
+
+      interface GraphQLResponse {
+        data: {
+          bondingCurves: Array<{
+            holderCount: number;
+            fundingManagerAddress: string;
+          }>;
+        };
+      }
+
+      const json: GraphQLResponse = await response.json();
+      
+      // Create a map for quick lookup by funding manager address
+      const dataMap = new Map<string, { holderCount: number }>();
+      json.data?.bondingCurves?.forEach((bc) => {
+        dataMap.set(bc.fundingManagerAddress.toLowerCase(), {
+          holderCount: bc.holderCount
+        });
+      });
+
+      return dataMap;
+    },
+  });
+
   // combine all data
   const detailsQuery = useQuery({
     queryKey: [
@@ -202,6 +254,7 @@ export function useBondingCurveDetails() {
             r?.result !== undefined ? (r.result as bigint | number).toString() : null
           )
         : null,
+      graphQLDataQuery.data ? Array.from(graphQLDataQuery.data.entries()) : null,
     ],
     enabled: !!(
       addressesQuery.data &&
@@ -209,7 +262,8 @@ export function useBondingCurveDetails() {
       tokenAddressesQuery.data &&
       tokenMetadataQuery.data &&
       tokenSupplyQuery.data &&
-      bcMetricsQuery.data
+      bcMetricsQuery.data &&
+      graphQLDataQuery.data
     ),
     queryFn: () => {
       const addresses = addressesQuery.data!;
@@ -218,6 +272,7 @@ export function useBondingCurveDetails() {
       const tokenMetadata = tokenMetadataQuery.data!;
       const tokenSupply = tokenSupplyQuery.data!;
       const bcMetrics = bcMetricsQuery.data!;
+      const graphQLData = graphQLDataQuery.data!;
 
       const detailsArray: BondingCurveDetails[] = [];
 
@@ -230,6 +285,7 @@ export function useBondingCurveDetails() {
           tokenAddressResult?.result
         ) {
           const tokenAddress = tokenAddressResult.result as `0x${string}`;
+          const fundingManagerAddress = fundingManagerResult.result as `0x${string}`;
           const metadataIndex = index * 3;
 
           const nameResult = tokenMetadata[metadataIndex];
@@ -238,6 +294,9 @@ export function useBondingCurveDetails() {
 
           const collateralResult = bcMetrics[index * 2];
           const crrResult = bcMetrics[index * 2 + 1];
+
+          // Get GraphQL data for this funding manager
+          const gqlData = graphQLData.get(fundingManagerAddress.toLowerCase());
 
           if (nameResult?.result && symbolResult?.result && decimalsResult?.result) {
             // compute market cap if supply & collateral available
@@ -264,6 +323,7 @@ export function useBondingCurveDetails() {
                 decimals: decimalsResult.result as number,
               },
               marketCap,
+              holderCount: gqlData?.holderCount,
             });
           }
         }
@@ -285,6 +345,7 @@ export function useBondingCurveDetails() {
       tokenMetadataQuery.isLoading ||
       tokenSupplyQuery.isLoading ||
       bcMetricsQuery.isLoading ||
+      graphQLDataQuery.isLoading ||
       detailsQuery.isLoading,
     error:
       countQuery.error ||
@@ -294,6 +355,7 @@ export function useBondingCurveDetails() {
       tokenMetadataQuery.error ||
       tokenSupplyQuery.error ||
       bcMetricsQuery.error ||
+      graphQLDataQuery.error ||
       detailsQuery.error,
     refetch: () => {
       countQuery.refetch();

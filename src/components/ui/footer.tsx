@@ -140,8 +140,8 @@ export const Footer = () => {
              <Image src={"/logo-white.png"} alt="" width={150} height={150} />
             </Link>
             <p className="text-white/70 text-base font-light w-full md:w-4/5">
-              Deploy autonomous AI trading agents on-chain. Create, configure,
-              and tokenize trading strategies with built-in risk management.
+              Deploy bonding curves to fund onchain strategies. Create transparent,
+              community-driven capital formation with customizable token economics.
             </p>
           </div>
 
@@ -155,13 +155,13 @@ export const Footer = () => {
                   className="text-neutral/50 whitespace-nowrap font-light"
                   href="/create"
                 >
-                  Create Agent
+                  Deploy
                 </Link>
                 <Link
                   className="text-neutral/50 whitespace-nowrap font-light"
                   href="/"
                 >
-                  Marketplace
+                  Explore
                 </Link>
                 <Link
                   className="text-neutral/50 whitespace-nowrap font-light"
@@ -182,7 +182,7 @@ export const Footer = () => {
                   className="pointer-events-none text-neutral/50 whitespace-nowrap font-light"
                   href="#"
                 >
-                  Strategy Library{" "}
+                  Curve Templates{" "}
                   <span className="inline-flex ml-1 py-0.5 px-3 bg-base-300 text-primary/90 text-xs rounded-xl -rotate-3">
                     soon
                   </span>{" "}
