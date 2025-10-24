@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Rye } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "@/providers/PrivyProvider";
@@ -32,9 +33,15 @@ const styreneA = localFont({
   variable: "--font-styrene-a",
 });
 
+const rye = Rye({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-rye",
+});
+
 export const metadata: Metadata = {
-  title: "Agent Launchpad",
-  description: "A platform for launching agents",
+  title: "Rodeo",
+  description: "Deploy bonding curves to fund onchain strategies. Create transparent, community-driven capital formation with customizable token economics.",
 };
 
 export default function RootLayout({
@@ -45,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${styreneA.className} ${styreneA.variable} antialiased text-foreground`}
+        className={`${styreneA.className} ${styreneA.variable} ${rye.className} antialiased text-foreground`}
       >
         <Providers>
           <SmoothScrolling>

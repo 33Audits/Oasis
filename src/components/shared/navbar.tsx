@@ -36,8 +36,9 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-transparent backdrop-blur-xl">
       <div className="container max-w-7xl mx-auto px-4 py-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-0.5">
-            <Image src={"/logo-white.png"} alt="" width={150} height={150} />
+          <div className="relative">
+            <Image src={"/coyboy-hat.png"} alt="" width={50} height={50} className="absolute -top-4 -right-2 transform rotate-15" />
+            <Link href="/" className="text-4xl font-semi-bold font-rye">Rodeo</Link>
           </div>
 
           {/* Desktop nav */}

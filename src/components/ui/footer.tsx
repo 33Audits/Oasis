@@ -133,12 +133,10 @@ export const Footer = () => {
         </div>
         <div className="flex flex-col md:flex-row items-start justify-between  gap-4 md:gap-10 px-2 md:px-8 flex-1">
           <div className="flex flex-col items-start gap-2">
-            <Link
-              href="/"
-              className=""
-            >
-             <Image src={"/logo-white.png"} alt="" width={150} height={150} />
-            </Link>
+          <div className="relative">
+            <Image src={"/coyboy-hat.png"} alt="" width={50} height={50} className="absolute -top-4 -right-2 transform rotate-15" />
+            <Link href="/" className="text-4xl font-semi-bold font-rye">Rodeo</Link>
+          </div>
             <p className="text-white/70 text-base font-light w-full md:w-4/5">
               Deploy bonding curves to fund onchain strategies. Create transparent,
               community-driven capital formation with customizable token economics.
@@ -245,7 +243,7 @@ export const Footer = () => {
       <div className="my-3 px-4 md:px-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-sm text-neutral">
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-8 items-start sm:items-center">
           <p className="whitespace-nowrap">
-            ©{currentYear} Oasis. All rights reserved.
+            ©{currentYear} Rodeo. All rights reserved.
           </p>
           <div className="flex flex-row gap-4">
             <Link href="/privacy">Privacy Policy</Link>
