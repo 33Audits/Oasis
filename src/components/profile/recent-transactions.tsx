@@ -11,7 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Check, Clock } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 interface Transaction {
   id: number;
@@ -21,6 +22,7 @@ interface Transaction {
   assets: string;
   value: string;
   status: string;
+  transactionHash: string;
 }
 
 interface RecentTransactionsProps {
@@ -31,9 +33,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
   return (
     <Card className="bg-neutral-950 border-neutral-800">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-neutral-50">
-          Recent Transactions
-        </CardTitle>
+        <CardTitle className="text-neutral-50">Recent Transactions</CardTitle>
         <Button
           variant="ghost"
           size="sm"
@@ -47,11 +47,10 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
           <TableHeader>
             <TableRow className="border-neutral-800 hover:bg-neutral-900">
               <TableHead className="text-neutral-400">Time</TableHead>
-              <TableHead className="text-neutral-400">Agent</TableHead>
               <TableHead className="text-neutral-400">Type</TableHead>
               <TableHead className="text-neutral-400">Assets</TableHead>
               <TableHead className="text-neutral-400">Value</TableHead>
-              <TableHead className="text-neutral-400">Status</TableHead>
+              <TableHead className="text-neutral-400">Tx Hash</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -60,46 +59,23 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                 key={tx.id}
                 className="border-neutral-800 hover:bg-neutral-900"
               >
-                <TableCell className="text-neutral-300">
-                  {tx.time}
-                </TableCell>
-                <TableCell className="text-neutral-50 font-medium">
-                  {tx.agent}
-                </TableCell>
-                <TableCell className="text-neutral-300">
-                  {tx.type}
-                </TableCell>
-                <TableCell className="text-neutral-300">
-                  {tx.assets}
-                </TableCell>
+                <TableCell className="text-neutral-300">{tx.time}</TableCell>
+                <TableCell className={`${tx.type.toLowerCase().includes("sell") ? "text-red-400" : "text-green-400"}`}>{tx.type}</TableCell>
+                <TableCell className="text-neutral-300">{tx.assets}</TableCell>
                 <TableCell className="text-neutral-50 font-mono">
                   {tx.value}
                 </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      tx.status === "Completed"
-                        ? "secondary"
-                        : "outline"
-                    }
-                    className={
-                      tx.status === "Pending"
-                        ? "border-blue-500 text-blue-400"
-                        : ""
-                    }
+                <TableCell className="text-neutral-400 font-mono ">
+                  <Link
+                    href={`https://sepolia.etherscan.io/tx/${tx.transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-primary"
                   >
-                    {tx.status === "Completed" ? (
-                      <>
-                        <Check className="w-3 h-3 mr-1" />
-                        Completed
-                      </>
-                    ) : (
-                      <>
-                        <Clock className="w-3 h-3 mr-1" />
-                        Pending
-                      </>
-                    )}
-                  </Badge>
+                    {tx.transactionHash?.slice(0, 6)}...
+                    {tx.transactionHash?.slice(-4)}
+                    <ExternalLink className="w-4 h-4 text-neutral-400" />
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}

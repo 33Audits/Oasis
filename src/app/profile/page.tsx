@@ -1,45 +1,100 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   LayoutDashboard,
-  Vault,
-  TrendingUp,
   Receipt,
   BookOpen,
   Settings,
   Bell,
   Search,
   Menu,
-  X,
-  ChevronDown,
   ChevronLeft,
 } from "lucide-react";
 import { FaMicrochip } from "react-icons/fa6";
 import { usePrivy } from "@privy-io/react-auth";
 import {
   OverviewStats,
-  AgentManagement,
-  PortfolioOverview,
-  AgentVaults,
-  FundingMarkets,
   RecentTransactions,
 } from "@/components/profile";
+import { useCreatorData } from "@/hooks/useCreatorData";
+import { useMultipleMarketCaps } from "@/hooks/useMarketCap";
+import { formatCompactNumber } from "@/lib/utils";
+import Image from "next/image";
 
 export default function ProfileDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeNav, setActiveNav] = useState("overview");
   const { user } = usePrivy();
-  const walletAddress = user?.wallet?.address;
-  const truncatedAddress = walletAddress
-    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-    : "Not Connected";
+  const walletAddress = user?.wallet?.address as `0x${string}` | undefined;
+
+  const { data: creatorData, isLoading, error } = useCreatorData(walletAddress as `0x${string}`);
+
+  const fundingManagerAddresses = creatorData?.bondingCurves?.map((curve: unknown) =>
+    (curve as any).fundingManagerAddress as `0x${string}`
+  ).filter(Boolean) || [];
+
+  const { data: marketCaps } = useMultipleMarketCaps(fundingManagerAddresses);
+
+  const projects = creatorData?.bondingCurves?.map((curve: unknown, index: number) => {
+    const fundingManagerAddress = (curve as any).fundingManagerAddress as `0x${string}`;
+    const marketCap = marketCaps?.[fundingManagerAddress];
+    const displayMarketCap =  marketCap !== null && marketCap !== undefined
+      ? `$${formatCompactNumber(marketCap)}`
+      : `$${formatCompactNumber(((curve as any).totalBuyVolume) / 1e18)}`;
+
+    return {
+      id: index + 1,
+      name: ((curve as any).tokenName || `Token ${index + 1}`),
+      symbol: ((curve as any).tokenSymbol || `T${index + 1}`),
+      address: (curve as any).orchestratorAddress,
+      marketCap: displayMarketCap,
+      holders: `${(curve as any).holderCount} holders`,
+      holderCount: (curve as any).holderCount,
+      createdAt: new Date(Number((curve as any).createdAt) * 1000).toLocaleDateString(),
+      status: ((curve as any).holderCount > 0 ? "Active" : "Inactive"),
+      currentPrice: `$${(Number((curve as any).currentPrice) / 1e18).toFixed(4)}`,
+    };
+  }) || [];
+
+
+  // Transform transactions data
+  const transactions = creatorData?.transactions?.map((tx: unknown, index: number) => ({
+    id: index + 1,
+    time: new Date(Number((tx as any).blockTimestamp) * 1000).toLocaleString(),
+    agent: (tx as any).transactionType,
+    type: (tx as any).transactionType,
+    assets: (tx as any).tokenAmount ? `${(Number((tx as any).tokenAmount) / 1e18).toFixed(4)} ${((tx as any)?.bondingCurve?.tokenSymbol)}` : "N/A",
+    value: (tx as any).paymentAmount ? `$${(Number((tx as any).paymentAmount) / 1e18).toFixed(2)} GAIA` : "N/A",
+    transactionHash: (tx as any).transactionHash,
+  })) || [];
+
+  const totalValue = fundingManagerAddresses.reduce((sum: number, address: `0x${string}`) => {
+    const marketCap = marketCaps?.[address];
+    if (marketCap !== null && marketCap !== undefined) {
+      return sum + marketCap;
+    }
+    
+    const curveData = creatorData?.bondingCurves?.find((c: unknown) =>
+      (c as any).fundingManagerAddress === address
+    );
+    if (curveData) {
+      return sum + Number((curveData as any).totalBuyVolume) / 1e18;
+    }
+    return sum;
+  }, 0) || 0;
+
+  const activeCurves = projects.length;
+  const totalHolders = projects.reduce((sum: number, project: unknown) => {
+    return sum + (project as any).holderCount;
+  }, 0);
+
+  const totalTransactions = transactions.length;
 
   const handleNavClick = (section: string) => {
     setActiveNav(section);
-    // Close mobile sidebar when navigating
     if (typeof window !== "undefined" && window.innerWidth < 768) {
       setSidebarCollapsed(true);
     }
@@ -55,184 +110,10 @@ export default function ProfileDashboard() {
 
   const navigationItems = [
     { name: "Dashboard", icon: LayoutDashboard, section: "overview" },
-    { name: "My Agents", icon: FaMicrochip, section: "agents" },
-    { name: "Agent Vaults", icon: Vault, section: "vaults" },
-    { name: "Funding Markets", icon: TrendingUp, section: "markets" },
+    { name: "Bonding Curves", icon: FaMicrochip, section: "projects" },
     { name: "Transactions", icon: Receipt, section: "transactions" },
     { name: "Knowledge Base", icon: BookOpen, section: "knowledge" },
     { name: "Settings", icon: Settings, section: "settings" },
-  ];
-
-  const agents = [
-    {
-      id: 1,
-      name: "Trading Alpha",
-      initials: "TA",
-      status: "Ready",
-      portfolio: "$24,580",
-      strategies: "3 active",
-      lastAction: "2 hours ago",
-      canTrain: false,
-    },
-    {
-      id: 2,
-      name: "Yield Optimizer",
-      initials: "YO",
-      status: "Training",
-      portfolio: "$18,920",
-      strategies: "2 active",
-      lastAction: "5 hours ago",
-      canTrain: true,
-    },
-    {
-      id: 3,
-      name: "DeFi Master",
-      initials: "DM",
-      status: "Ready",
-      portfolio: "$32,150",
-      strategies: "5 active",
-      lastAction: "1 hour ago",
-      canTrain: false,
-    },
-  ];
-
-  const vaults = [
-    {
-      id: 1,
-      name: "Alpha Trading Vault",
-      agent: "Trading Alpha",
-      capital: "$24,580",
-      assets: "ETH, USDC",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Yield Optimization Vault",
-      agent: "Yield Optimizer",
-      capital: "$18,920",
-      assets: "USDC, DAI",
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "DeFi Strategy Vault",
-      agent: "DeFi Master",
-      capital: "$32,150",
-      assets: "ETH, BTC, USDC",
-      status: "Active",
-    },
-    {
-      id: 4,
-      name: "Arbitrage Vault",
-      agent: "Arbitrage Scout",
-      capital: "$28,470",
-      assets: "Multi-chain",
-      status: "Active",
-    },
-    {
-      id: 5,
-      name: "Risk Hedging Vault",
-      agent: "Risk Manager",
-      capital: "$15,600",
-      assets: "ETH, USDC",
-      status: "Paused",
-    },
-  ];
-
-  const markets = [
-    {
-      id: 1,
-      title: "Alpha Trading Initial Funding",
-      agent: "Trading Alpha",
-      progress: 85,
-      raised: "$42,500",
-      target: "$50,000",
-      status: "Active",
-    },
-    {
-      id: 2,
-      title: "Yield Optimizer Launch",
-      agent: "Yield Optimizer",
-      progress: 100,
-      raised: "$30,000",
-      target: "$30,000",
-      status: "Completed",
-    },
-    {
-      id: 3,
-      title: "DeFi Master Expansion",
-      agent: "DeFi Master",
-      progress: 45,
-      raised: "$22,500",
-      target: "$50,000",
-      status: "Active",
-    },
-    {
-      id: 4,
-      title: "Liquidity Hunter Bootstrap",
-      agent: "Liquidity Hunter",
-      progress: 15,
-      raised: "$3,000",
-      target: "$20,000",
-      status: "Active",
-    },
-  ];
-
-  const transactions = [
-    {
-      id: 1,
-      time: "2 min ago",
-      agent: "Trading Alpha",
-      type: "Spot Trade",
-      assets: "ETH → USDC",
-      value: "$5,420",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      time: "15 min ago",
-      agent: "Yield Optimizer",
-      type: "Yield Strategy",
-      assets: "USDC",
-      value: "$3,200",
-      status: "Completed",
-    },
-    {
-      id: 3,
-      time: "1 hour ago",
-      agent: "DeFi Master",
-      type: "Rebalance",
-      assets: "Multi-asset",
-      value: "$12,850",
-      status: "Completed",
-    },
-    {
-      id: 4,
-      time: "2 hours ago",
-      agent: "Arbitrage Scout",
-      type: "Spot Trade",
-      assets: "BTC → ETH",
-      value: "$8,900",
-      status: "Completed",
-    },
-    {
-      id: 5,
-      time: "3 hours ago",
-      agent: "Trading Alpha",
-      type: "Liquidity Provision",
-      assets: "ETH/USDC",
-      value: "$6,500",
-      status: "Pending",
-    },
-    {
-      id: 6,
-      time: "5 hours ago",
-      agent: "Yield Optimizer",
-      type: "Yield Strategy",
-      assets: "DAI",
-      value: "$4,100",
-      status: "Completed",
-    },
   ];
 
   return (
@@ -371,23 +252,92 @@ export default function ProfileDashboard() {
         <main className="flex-1 p-4 sm:p-6">
           <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
             <div id="overview" className="pt-6 sm:pt-8">
-              <OverviewStats />
+              <OverviewStats
+                totalValue={`$${formatCompactNumber(totalValue)}`}
+                activeCurves={activeCurves}
+                totalTransactions={totalTransactions}
+                totalHolders={totalHolders}
+              />
             </div>
 
-            <div id="agents" className="pt-6 sm:pt-8">
-              <AgentManagement agents={agents} />
+            <div id="projects" className="pt-6 sm:pt-8">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-neutral-400">Loading bonding curves...</div>
+                </div>
+              ) : error ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-red-400">Error loading bonding curves: {error.message}</div>
+                </div>
+              ) : projects.length === 0 ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-neutral-400">No bonding curves found</div>
+                </div>
+              ) : (
+                <div className="max-w-7xl mx-auto w-full container space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
+                  <div className="flex flex-wrap gap-4 items-center justify-between mb-12">
+                    <h2 className="text-3xl md:text-5xl font-normal text-white">My Bonding Curves</h2>
+                  </div>
+
+                  <div className="border border-neutral-800 p-4 rounded-xl">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-neutral-700">
+                          <th className="w-[200px] text-left text-neutral-300 p-2">Token</th>
+                          <th className="w-[100px] text-left text-neutral-300 p-2">Symbol</th>
+                          <th className="w-[120px] text-left text-neutral-300 p-2">Market Cap</th>
+                          <th className="w-[100px] text-left text-neutral-300 p-2">Holders</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {projects.map((project: unknown) => (
+                          <tr
+                            key={(project as any).address}
+                            className="border-neutral-700 hover:bg-neutral-800 cursor-pointer"
+                            onClick={() => window.open(`/project/${(project as any).address}`, '_blank')}
+                          >
+                            <td className="p-2">
+                              <div className="flex items-center gap-3">
+                                <div className="h-8 w-8 bg-neutral-700 rounded-full flex items-center justify-center">
+                                  <span className="text-neutral-300 text-sm">
+                                    <Image src="/33labs.jpg" alt={(project as any).name} width={32} height={32} />
+                                  </span>
+                                </div>
+                                <span className="text-neutral-300">{(project as any).name}</span>
+                              </div>
+                            </td>
+                            <td className="p-2 font-mono text-neutral-300">
+                              ${(project as any).symbol}
+                            </td>
+                            <td className="p-2 text-neutral-300">
+                              {(project as any).marketCap}
+                            </td>
+                            <td className="p-2 text-neutral-300">
+                              {(project as any).holders}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                </div>
+              )}
             </div>
 
-            <div id="vaults" className="pt-6 sm:pt-8">
-              <AgentVaults vaults={vaults} />
-            </div>
-
-            <div id="markets" className="pt-6 sm:pt-8">
-              <FundingMarkets markets={markets} />
-            </div>
 
             <div id="transactions" className="pt-6 sm:pt-8">
-              <RecentTransactions transactions={transactions} />
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-neutral-400">Loading transactions...</div>
+                </div>
+              ) : error ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-red-400">Error loading transactions: {error.message}</div>
+                </div>
+              ) : (
+                <RecentTransactions transactions={transactions} />
+              )}
             </div>
 
             {/* Placeholder sections for future implementation */}
