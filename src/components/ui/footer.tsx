@@ -134,8 +134,13 @@ export const Footer = () => {
         <div className="flex flex-col md:flex-row items-start justify-between  gap-4 md:gap-10 px-2 md:px-8 flex-1">
           <div className="flex flex-col items-start gap-2">
           <div className="relative">
-            <Image src={"/coyboy-hat.png"} alt="" width={50} height={50} className="absolute -top-4 -right-2 transform rotate-15" />
-            <Link href="/" className="text-4xl font-semi-bold font-rye">Rodeo</Link>
+          <Image
+              src={"/rodeo.png"}
+              alt=""
+              width={150}
+              height={150}
+              className="transform rotate-15 w-25 h-25"
+            />
           </div>
             <p className="text-white/70 text-base font-light w-full md:w-4/5">
               Deploy bonding curves to fund onchain strategies. Create transparent,

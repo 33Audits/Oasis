@@ -34,11 +34,17 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-transparent backdrop-blur-xl">
-      <div className="container max-w-7xl mx-auto px-4 py-5">
+      <div className="container max-w-7xl mx-auto px-4 py-1">
         <div className="flex items-center justify-between">
           <div className="relative">
-            <Image src={"/coyboy-hat.png"} alt="" width={50} height={50} className="absolute -top-4 -right-2 transform rotate-15" />
-            <Link href="/" className="text-4xl font-semi-bold font-rye">Rodeo</Link>
+            <Image
+              src={"/rodeo.png"}
+              alt=""
+              width={150}
+              height={150}
+              className="transform rotate-15 w-25 h-25"
+            />
+            {/* <Link href="/" className="text-4xl font-semi-bold font-rye">Rodeo</Link> */}
           </div>
 
           {/* Desktop nav */}
@@ -50,7 +56,9 @@ export default function Navbar() {
               Home
             </button>
             <button
-              onClick={() => handleNavigation("#bonding-curves", pathname, router)}
+              onClick={() =>
+                handleNavigation("#bonding-curves", pathname, router)
+              }
               className="text-base text-foreground hover:text-foreground/80 cursor-pointer"
             >
               Bonding Curves
@@ -66,11 +74,11 @@ export default function Navbar() {
           {/* Desktop wallet button */}
           <div className="flex items-center space-x-2">
             {isAuthenticated && (
-            <Link href="/create" className="hidden md:block">
-              <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-                Deploy
-              </Button>
-            </Link>
+              <Link href="/create" className="hidden md:block">
+                <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
+                  Deploy
+                </Button>
+              </Link>
             )}
 
             <ConnectWalletButton />
