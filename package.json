@@ -35,6 +35,7 @@
     "@thebadmandev/x402-next": "^0.7.0",
     "@zerodev/ecdsa-validator": "^5.4.9",
     "@zerodev/sdk": "^5.5.4",
+    "abitype": "^1.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
