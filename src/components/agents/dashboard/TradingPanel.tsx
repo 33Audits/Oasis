@@ -46,9 +46,9 @@ export function TradingPanel({
 
   const { address } = useAccount();
   const queryClient = useQueryClient();
-  const { buyFromBondingCurve, isPending: isBuyingPending } =
+  const { buyFromBondingCurve, isLoading: isBuyingPending } =
     useBuyFromBondingCurve();
-  const { sellFromBondingCurve, isPending: isSellingPending } =
+  const { sellFromBondingCurve, isLoading: isSellingPending } =
     useSellFromBondingCurve();
 
   const { data: purchaseReturn } = useReadContract({

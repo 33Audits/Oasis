@@ -85,8 +85,8 @@ export const ZeroDevProvider: React.FC<ZeroDevProviderProps> = ({
       });
 
       // Create a ZeroDev ECDSA validator (EP 0.7, Kernel v3.1)
-      const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
-        signer: walletClient,
+      const ecdsaValidator = await signerToEcdsaValidator(publicClient as any, {
+        signer: walletClient as any,
         entryPoint: {
           address: entryPoint07Address,
           version: '0.7',
@@ -95,7 +95,7 @@ export const ZeroDevProvider: React.FC<ZeroDevProviderProps> = ({
       });
 
       // Create a Kernel account from the ECDSA validator
-      const account = await createKernelAccount(publicClient, {
+      const account = await createKernelAccount(publicClient as any, {
         plugins: { sudo: ecdsaValidator },
         entryPoint: {
           address: entryPoint07Address,
