@@ -27,7 +27,7 @@ export async function verifyPayment(payload: string): Promise<string> {
 
   const { verify, settle } = useFacilitator(
     {
-      url: "https://oasis-x402.vercel.app/api",
+      url: process.env.NEXT_PUBLIC_FACILITATOR_URL as `${string}://${string}`,
     }
   ); // eslint-disable-line
 
@@ -73,7 +73,7 @@ export async function verifyDeploymentPayment(payload: string): Promise<{ succes
     },
   };
 
-  const facilitatorUrl = "https://oasis-x402.vercel.app/api";
+  const facilitatorUrl = process.env.NEXT_PUBLIC_FACILITATOR_URL as `${string}://${string}`;
   const { verify, settle } = useFacilitator({
     url: facilitatorUrl,
   });
