@@ -6,7 +6,11 @@ import { toast } from "sonner";
 import { formatEther } from "viem";
 import { Coins, Loader2 } from "lucide-react";
 
-export function MintTokensButton() {
+interface MintTokensButtonProps {
+  onMintSuccess?: () => void | Promise<void>;
+}
+
+export function MintTokensButton({ onMintSuccess }: MintTokensButtonProps) {
   const { mintTokens, isLoading, isInitializing, mintAmount, tokenAddress } =
     useMintTokens();
 
@@ -17,6 +21,10 @@ export function MintTokensButton() {
         description: `You received ${formatEther(mintAmount)} GAIA tokens`,
       });
       console.log("Mint transaction:", result);
+      
+      if (onMintSuccess) {
+        await onMintSuccess();
+      }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to mint tokens";
@@ -31,7 +39,7 @@ export function MintTokensButton() {
     <Button
       onClick={handleMint}
       disabled={isLoading || isInitializing}
-      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+      className="bg-primary text-white"
     >
       {isLoading ? (
         <>
