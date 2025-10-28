@@ -24,5 +24,7 @@ export const contractAddress = {
       Orchestrator_v1__BondingCurve: "0x8054F3845dA9eB4505918fdC0472b7e3D83fE82B",
       /// @deprecated This is the first Gaia Bonding Curve (just for testing, in real usecases you will grab this dinamically)
       FM_BC_Bancor_Gaia_v1: "0x0F1143A76A21fd3b0e2Ff9c76CE2153aA04Af782",
+
+      MULTICALL3_ADDRESS: "0xcA11bde05977b3631167028862bE2a173976CA11",
     }
 } as const satisfies ChainAndContractAddress;

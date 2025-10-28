@@ -1,21 +1,16 @@
-import { usePublicClient, useWriteContract } from "wagmi";
+import { usePublicClient } from "wagmi";
 import { sepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
-import { useCallback } from "react";
-import { useWallets } from "@privy-io/react-auth";
+import { useCallback, useState } from "react";
+import { useZeroDev } from "@/providers/ZeroDev";
 
 export function useBuyFromBondingCurve() {
   const publicClient = usePublicClient();
-  const { writeContractAsync, ...rest } = useWriteContract();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const { wallets } = useWallets();
-
-  const activeWallet = wallets?.[0];
-
-  const walletChainId = activeWallet?.chainId
-    ? Number(activeWallet.chainId.split(':')[1])
-    : NaN;
+  const { kernelClient, isInitializing } = useZeroDev();
 
   const buyFromBondingCurve = useCallback(async (params: {
     bcAddress: `0x${string}`,
@@ -23,40 +18,60 @@ export function useBuyFromBondingCurve() {
     depositAmount: bigint,
     minAmountOut: bigint,
   }) => {
-    if (!publicClient) {
-      throw new Error("Public client not available");
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      if (!publicClient) {
+        throw new Error("Public client not available");
+      }
+
+      if (!kernelClient) {
+        throw new Error("Smart account not initialized. Please wait...");
+      }
+
+      // Approve token spending using ZeroDev (gasless)
+      // @ts-expect-error - ZeroDev kernel client has account embedded
+      const approveTxHash = await kernelClient.writeContract({
+        address: contractAddress[sepolia.id].FakeGaiaToken,
+        abi: abis.ERC20Mint,
+        functionName: "approve",
+        args: [params.bcAddress, params.depositAmount],
+      });
+
+      await publicClient.waitForTransactionReceipt({
+        hash: approveTxHash,
+        confirmations: 1,
+      });
+
+      // Buy tokens using ZeroDev (gasless)
+      // @ts-expect-error - ZeroDev kernel client has account embedded
+      const txid = await kernelClient.writeContract({
+        address: params.bcAddress,
+        abi: abis.FM_BC_Bancor_Gaia_v1,
+        functionName: "buyFor",
+        args: [params.receiver, params.depositAmount, params.minAmountOut],
+        gas: BigInt(2100000),
+      });
+
+      const receipt = await publicClient.waitForTransactionReceipt({
+        hash: txid,
+        confirmations: 1,
+      });
+
+      if (receipt.status !== "success") {
+        throw new Error("Transaction failed: " + receipt.status);
+      }
+
+      return { txid, receipt };
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
+  }, [kernelClient, publicClient]);
 
-    // if (walletChainId !== sepolia.id) {
-    //   throw new Error("Please switch to Sepolia to buy from a bonding curve");
-    // }
-
-    await writeContractAsync({
-      address: contractAddress[sepolia.id].FakeGaiaToken,
-      abi: abis.ERC20Mint,
-      functionName: "approve",
-      args: [params.bcAddress, params.depositAmount],
-    });
-
-    const txid =  await writeContractAsync({
-      address: params.bcAddress,
-      abi: abis.FM_BC_Bancor_Gaia_v1,
-      functionName: "buyFor",
-      args: [params.receiver, params.depositAmount, params.minAmountOut],
-      gas: BigInt(2100000),
-    });
-
-    const receipt = await publicClient.waitForTransactionReceipt({
-      hash: txid,
-      confirmations: 1,
-    });
-
-    if (receipt.status !== "success") {
-      throw new Error("Transaction failed: " + receipt.status);
-    }
-
-    return { txid, receipt };
-  }, [writeContractAsync, publicClient]);
-
-  return { buyFromBondingCurve, ...rest };
+  return { buyFromBondingCurve, isLoading, error, isInitializing };
 }

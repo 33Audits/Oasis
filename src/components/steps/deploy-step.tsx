@@ -8,9 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { AnimatedCard } from "@/components/ui/animated-card";
-import { Rocket, DollarSign, Copy } from "lucide-react";
+import { Rocket, DollarSign, Copy, CreditCard } from "lucide-react";
 import { useBondingCurveStore } from "@/lib/store";
 import { useCreateBondingCurve } from "@/hooks/useCreateBondingCurve";
+import { useX402Payment } from "@/hooks/useX402Payment";
+import { verifyDeploymentPayment } from "@/app/actions";
+import { PaymentRequirements } from "@thebadmandev/x402/types";
 import { copyToClipboard } from "@/lib/utils";
 import { toast } from "sonner";
 import { formatUnits, parseEther } from "viem";
@@ -19,11 +22,31 @@ export function DeployStep() {
   const { formData, updateFormData, resetForm } = useBondingCurveStore();
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployProgress, setDeployProgress] = useState(0);
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "completed" | "failed">("idle");
 
   const router = useRouter();
 
-  const { createBondingCurve, minDepositAmount, bcWorkflowAddress, isPending } =
+  const { createBondingCurve, minDepositAmount, bcWorkflowAddress, isLoading, isInitializing } =
     useCreateBondingCurve();
+  const { processPayment, isProcessing: isPaymentProcessing, userAddress } = useX402Payment();
+
+  // Payment requirements for deployment
+  const paymentRequirements: PaymentRequirements = {
+    scheme: "exact",
+    network: "sepolia",
+    maxAmountRequired: "1000000", // 1 USDC (6 decimals)
+    resource: "bonding-curve-deployment",
+    description: "Payment for bonding curve deployment",
+    mimeType: "application/json",
+    payTo: "0x02F6302D1b7C94FF01a2B59ebAC8d9aa2fc62522",
+    maxTimeoutSeconds: 300,
+    asset: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238", // USDC on Sepolia
+    outputSchema: undefined,
+    extra: {
+      name: "USDC",
+      version: "2",
+    },
+  };
 
   const handleInputChange = (field: string, value: string) => {
     if (field === "stakeAmount") {
@@ -57,6 +80,39 @@ export function DeployStep() {
     try {
       setIsDeploying(true);
       setDeployProgress(0);
+      setPaymentStatus("processing");
+
+      // Step 1: Process x402 payment
+      toast.info("Processing Payment", {
+        description: "Please sign the USDC payment authorization...",
+      });
+
+      let paymentResult;
+      try {
+        paymentResult = await processPayment(paymentRequirements);
+      } catch (paymentError) {
+        setPaymentStatus("failed");
+        throw new Error("Payment signature cancelled or failed");
+      }
+
+      setDeployProgress(15);
+
+      // Step 2: Verify payment on server
+      toast.info("Verifying Payment", {
+        description: "Verifying your USDC payment...",
+      });
+
+      const verificationResult = await verifyDeploymentPayment(paymentResult.payment);
+
+      if (!verificationResult.success) {
+        setPaymentStatus("failed");
+        throw new Error(verificationResult.error || "Payment verification failed");
+      }
+
+      setPaymentStatus("completed");
+      toast.success("Payment Verified!", {
+        description: "Your payment has been confirmed. Deploying bonding curve...",
+      });
 
       setDeployProgress(25);
 
@@ -103,12 +159,22 @@ export function DeployStep() {
       setIsDeploying(false);
       const errorMessage =
         err instanceof Error ? err.message : "Failed to create bonding curve";
-      toast.error("Deployment Failed", {
-        description: errorMessage,
-      });
+      
+      if (paymentStatus === "failed" || errorMessage.includes("Payment")) {
+        toast.error("Payment Failed", {
+          description: errorMessage,
+        });
+      } else {
+        toast.error("Deployment Failed", {
+          description: errorMessage,
+        });
+      }
       console.error("Deployment failed:", err);
     } finally {
       setIsDeploying(false);
+      if (paymentStatus === "processing") {
+        setPaymentStatus("idle");
+      }
     }
   };
 
@@ -157,29 +223,45 @@ export function DeployStep() {
           </AnimatedCard>
 
           {!isDeploying && deployProgress === 0 && (
-            <Button
-              onClick={handleDeploy}
-              className="w-full bg-white text-black rounded-xl hover:bg-white/90"
-              disabled={!formData.stakeAmount || isPending}
-            >
-              <Rocket className="mr-2 h-4 w-4" />
-              {isPending ? "Creating Bonding Curve..." : "Deploy Bonding Curve"}
-            </Button>
+            <div className="space-y-3">
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-sm text-blue-400">
+                  <CreditCard className="h-4 w-4" />
+                  <span className="font-medium">Deployment Fee: 1 USDC</span>
+                </div>
+                <p className="text-xs text-neutral-400 mt-1">
+                  Payment will be processed via x402 (gasless signature)
+                </p>
+              </div>
+              <Button
+                onClick={handleDeploy}
+                className="w-full bg-white text-black rounded-xl hover:bg-white/90"
+                disabled={!formData.stakeAmount || isLoading || isInitializing || !userAddress}
+              >
+                <Rocket className="mr-2 h-4 w-4" />
+                {isInitializing ? "Initializing Smart Account..." : isLoading ? "Creating Bonding Curve..." : "Pay & Deploy Bonding Curve"}
+              </Button>
+            </div>
           )}
 
-          {(isDeploying || isPending) && (
+          {(isDeploying || isLoading) && (
             <AnimatedCard className="border-white/20">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
-                    <Rocket className="h-5 w-5 text-primary animate-pulse" />
+                    {deployProgress < 25 ? (
+                      <CreditCard className="h-5 w-5 text-blue-500 animate-pulse" />
+                    ) : (
+                      <Rocket className="h-5 w-5 text-primary animate-pulse" />
+                    )}
                     <span className="text-foreground font-medium">
-                      Deploying Bonding Curve...
+                      {deployProgress < 25 ? "Processing Payment..." : "Deploying Bonding Curve..."}
                     </span>
                   </div>
                   <Progress value={deployProgress} className="w-full" />
                   <p className="text-sm text-neutral-400">
-                    {deployProgress < 25 && "Preparing parameters..."}
+                    {deployProgress < 15 && "Signing USDC payment authorization..."}
+                    {deployProgress >= 15 && deployProgress < 25 && "Verifying payment..."}
                     {deployProgress >= 25 &&
                       deployProgress < 50 &&
                       "Approving tokens..."}

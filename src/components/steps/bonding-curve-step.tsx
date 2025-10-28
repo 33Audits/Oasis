@@ -44,7 +44,7 @@ export function BondingCurveStep() {
                 <div className="space-y-3">
                   <Slider
                     value={[formData.reserveRatioForBuying]}
-                    onValueChange={(value) => handleInputChange("reserveRatioForBuying", value[0].toString())}
+                    onValueChange={(value:any) => handleInputChange("reserveRatioForBuying", value[0].toString())}
                     max={100}
                     min={1}
                     step={1}
@@ -62,7 +62,7 @@ export function BondingCurveStep() {
                 <div className="space-y-3">
                   <Slider
                     value={[formData.reserveRatioForSelling]}
-                    onValueChange={(value) => handleInputChange("reserveRatioForSelling", value[0].toString())}
+                    onValueChange={(value:any) => handleInputChange("reserveRatioForSelling", value[0].toString())}
                     max={100}
                     min={1}
                     step={1}
