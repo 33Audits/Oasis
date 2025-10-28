@@ -27,7 +27,7 @@ export async function verifyPayment(payload: string): Promise<string> {
 
   const { verify, settle } = useFacilitator(
     {
-      url: "https://x402-facilitator-vercel.onrender.com/api",
+      url: "http://localhost:3000/api",
     }
   ); // eslint-disable-line
 
@@ -73,7 +73,7 @@ export async function verifyDeploymentPayment(payload: string): Promise<{ succes
     },
   };
 
-  const facilitatorUrl = "https://x402-facilitator-vercel.onrender.com/api";
+  const facilitatorUrl = "http://localhost:3000/api";
   const { verify, settle } = useFacilitator({
     url: facilitatorUrl,
   });

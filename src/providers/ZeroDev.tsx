@@ -115,7 +115,7 @@ export const ZeroDevProvider: React.FC<ZeroDevProviderProps> = ({
         bundlerTransport: http(ZERODEV_RPC),
         client: publicClient,
         paymaster: {
-          getPaymasterData(userOperation) {
+          getPaymasterData(userOperation:any) {
             return zerodevPaymaster.sponsorUserOperation({ userOperation });
           },
         },

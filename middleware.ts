@@ -17,7 +17,7 @@ export const middleware = paymentMiddleware(
     },
   },
   {
-    url: "https://x402-facilitator-vercel.onrender.com/api",
+    url: "http://localhost:3000/api",
   },
   {
     appName: "Next x402 Demo",
