@@ -21,7 +21,7 @@ export function MintTokensButton({ onMintSuccess }: MintTokensButtonProps) {
         description: `You received ${formatEther(mintAmount)} LAUNCHPAD tokens`,
       });
       console.log("Mint transaction:", result);
-      
+
       if (onMintSuccess) {
         await onMintSuccess();
       }
@@ -39,7 +39,7 @@ export function MintTokensButton({ onMintSuccess }: MintTokensButtonProps) {
     <Button
       onClick={handleMint}
       disabled={isLoading || isInitializing}
-      className="bg-primary text-white"
+      className="rounded-xl bg-white border border-white/50 hover:bg-white/90 text-black hover:text-black font-mono cursor-pointer"
     >
       {isLoading ? (
         <>
