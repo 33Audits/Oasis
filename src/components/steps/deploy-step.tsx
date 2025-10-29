@@ -195,7 +195,7 @@ export function DeployStep() {
                   Minimum stake:{" "}
                   {minDepositAmount
                     ? formatUnits(minDepositAmount, 18)
-                    : "Loading..."}{" "}
+                    : 1000}{" "}
                   LAUNCHPAD tokens
                 </p>
               </div>
@@ -210,7 +210,7 @@ export function DeployStep() {
                   <span className="font-medium">Deployment Fee: 1 USDC</span>
                 </div>
                 <p className="text-xs text-neutral-400 mt-1">
-                  Payment will be processed via x402 (gasless signature)
+                  Payment will be processed via x402
                 </p>
               </div>
               <Button
@@ -219,7 +219,7 @@ export function DeployStep() {
                 disabled={!formData.stakeAmount || isLoading || isInitializing || !userAddress}
               >
                 <Rocket className="mr-2 h-4 w-4" />
-                {isInitializing ? "Initializing Smart Account..." : isLoading ? "Creating Bonding Curve..." : "Pay & Deploy Bonding Curve"}
+                {isInitializing ? "Initializing Smart Account..." : isLoading ? "Creating Bonding Curve..." : "Deploy Bonding Curve with X402"}
               </Button>
             </div>
           )}
@@ -263,7 +263,7 @@ export function DeployStep() {
                     🎉 Bonding Curve Deployed Successfully!
                   </div>
                   <p className="text-sm text-neutral-400">
-                    Your bonding curve is now live on Sepolia testnet.
+                    Your bonding curve is now live on Base Sepolia testnet.
                   </p>
                   <div className="flex items-center justify-center space-x-2 mt-2">
                     <p className="text-xs text-neutral-500 font-mono">

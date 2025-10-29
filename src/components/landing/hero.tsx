@@ -5,7 +5,7 @@ import Sponsors from "./sponsors";
 
 export default function Hero() {
   return (
-    <section className="min-h-screen top-0 relative overflow-hidden" id="home">
+    <section className=" top-0 relative overflow-hidden" id="home">
       <div className="top-0 absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/20" />
       <div className="relative container mx-auto px-4 py-28">
         <div className="text-center space-y-8 max-w-5xl mx-auto">
