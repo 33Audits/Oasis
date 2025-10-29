@@ -47,7 +47,17 @@ export function useSellFromBondingCurve() {
           chain: baseSepolia,
         });
 
-        // Sell tokens (don't wait for approve confirmation to bundle)
+        // Wait for approval to complete
+        const approveReceipt = await publicClient.waitForTransactionReceipt({
+          hash: approveTxHash,
+          confirmations: 1,
+        });
+
+        if (approveReceipt.status !== "success") {
+          throw new Error("Approval transaction failed");
+        }
+
+        // Sell tokens after approval is confirmed
         const sellTxHash = await walletClient.writeContract({
           address: params.bcAddress,
           abi: abis.FM_BC_Bancor_Launchpad_v1,
@@ -58,21 +68,11 @@ export function useSellFromBondingCurve() {
           gas: BigInt(2100000),
         });
 
-        // Wait for both transactions in parallel
-        const [approveReceipt, sellReceipt] = await Promise.all([
-          publicClient.waitForTransactionReceipt({
-            hash: approveTxHash,
-            confirmations: 1,
-          }),
-          publicClient.waitForTransactionReceipt({
-            hash: sellTxHash,
-            confirmations: 1,
-          }),
-        ]);
-
-        if (approveReceipt.status !== "success") {
-          throw new Error("Approval transaction failed");
-        }
+        // Wait for sell transaction to complete
+        const sellReceipt = await publicClient.waitForTransactionReceipt({
+          hash: sellTxHash,
+          confirmations: 1,
+        });
 
         if (sellReceipt.status !== "success") {
           throw new Error("Sell transaction failed");
