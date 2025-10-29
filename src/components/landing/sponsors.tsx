@@ -2,33 +2,39 @@ import Image from "next/image";
 
 export default function Sponsors() {
   const brands = [
+    // {
+    //   name: "Gaia",
+    //   src: "/images/brands/gaia-logo.svg",
+    //   width: 80,
+    //   height: 40,
+    // },
+    // {
+    //   name: "Linear",
+    //   src: "/images/brands/Linear.svg",
+    //   width: 120,
+    //   height: 60,
+    // },
+    // {
+    //   name: "Ember AI",
+    //   src: "/images/brands/ember-ai.svg",
+    //   width: 120,
+    //   height: 60,
+    // },
     {
-      name: "Gaia",
-      src: "/images/brands/gaia-logo.svg",
-      width: 80,
-      height: 40,
-    },
-    {
-      name: "Linear",
-      src: "/images/brands/Linear.svg",
-      width: 120,
-      height: 60,
-    },
-    {
-      name: "Ember AI",
-      src: "/images/brands/ember-ai.svg",
-      width: 120,
-      height: 60,
-    },
+      name: "X402",
+      src: "/images/brands/x402-button-xl.png",
+      width: 250,
+      height: 100,
+    }
   ];
 
   return (
     <section className="pt-0 pb-24">
       <div className="container mx-auto px-4">
         <div className="text-center">
-          <h2 className="text-xl font-light text-white/70 mb-1">
+          {/* <h2 className="text-xl font-light text-white/70 mb-1">
             Powered by
-          </h2>
+          </h2> */}
 
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
             {brands.map((brand) => (
@@ -41,7 +47,7 @@ export default function Sponsors() {
                   alt={`${brand.name} logo`}
                   width={brand.width}
                   height={brand.height}
-                  className="object-contain filter brightness-90"
+                  className="object-contain bg-white rounded-xl"
                   priority
                 />
               </div>

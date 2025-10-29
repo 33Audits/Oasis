@@ -44,7 +44,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
-      {/* <Sponsors/> */}
+      <Sponsors/>
     </section>
   );
 }
