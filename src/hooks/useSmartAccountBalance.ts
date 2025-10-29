@@ -2,8 +2,10 @@ import { useEffect, useState, useCallback } from "react";
 import { usePublicClient } from "wagmi";
 import { useZeroDev } from "@/providers/ZeroDev";
 import { abis } from "@/lib/abis";
+import { contractAddress } from "@/lib/contractAddress";
+import { baseSepolia } from "viem/chains";
 
-const GAIA_TOKEN_ADDRESS = "0x525470415c0958a749888d4f2e872ef1cf0a73c1" as const;
+const COLLATERAL_TOKEN_ADDRESS = contractAddress[baseSepolia.id].CollateralToken;
 
 export function useSmartAccountBalance() {
   const publicClient = usePublicClient();
@@ -20,7 +22,7 @@ export function useSmartAccountBalance() {
     try {
       setIsLoading(true);
       const bal = await publicClient.readContract({
-        address: GAIA_TOKEN_ADDRESS,
+        address: COLLATERAL_TOKEN_ADDRESS,
         abi: abis.ERC20Mint,
         functionName: "balanceOf",
         args: [smartAccountAddress as `0x${string}`],

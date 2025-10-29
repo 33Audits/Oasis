@@ -1,9 +1,10 @@
 import { useState, useCallback } from "react";
 import { useSignTypedData } from "wagmi";
-import { preparePaymentHeader } from "@thebadmandev/x402/client";
-import { PaymentRequirements, PaymentPayload } from "@thebadmandev/x402/types";
-import { exact } from "@thebadmandev/x402/schemes";
+import { preparePaymentHeader } from "x402/client";
+import { PaymentRequirements, PaymentPayload } from "x402/types";
+import { exact } from "x402/schemes";
 import { usePrivy } from "@privy-io/react-auth";
+import { baseSepolia } from "viem/chains";
 
 export function useX402Payment() {
   const { user } = usePrivy();
@@ -42,7 +43,7 @@ export function useX402Payment() {
           domain: {
             name: paymentRequirements.extra?.name || "USDC",
             version: paymentRequirements.extra?.version || "2",
-            chainId: 11155111, // Sepolia
+            chainId: baseSepolia.id,
             verifyingContract: paymentRequirements.asset as `0x${string}`,
           },
           primaryType: "TransferWithAuthorization" as const,

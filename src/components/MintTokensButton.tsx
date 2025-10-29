@@ -54,7 +54,7 @@ export function MintTokensButton({ onMintSuccess }: MintTokensButtonProps) {
       ) : (
         <>
           <Coins className="mr-2 h-4 w-4" />
-          Mint 100,000 GAIA Tokens
+          Mint 100,000 Collateral Tokens
         </>
       )}
     </Button>

@@ -53,7 +53,7 @@ export function TradingPanel({
 
   const { data: purchaseReturn } = useReadContract({
     address: bondingCurveAddress,
-    abi: abis.FM_BC_Bancor_Gaia_v1,
+    abi: abis.FM_BC_Bancor_Launchpad_v1,
     functionName: "calculatePurchaseReturn",
     args: buyAmount && isValidAmount(buyAmount) ? [parseEther(buyAmount)] : undefined,
     query: {
@@ -64,7 +64,7 @@ export function TradingPanel({
 
   const { data: saleReturn } = useReadContract({
     address: bondingCurveAddress,
-    abi: abis.FM_BC_Bancor_Gaia_v1,
+    abi: abis.FM_BC_Bancor_Launchpad_v1,
     functionName: "calculateSaleReturn",
     args: sellAmount && isValidAmount(sellAmount) ? [parseEther(sellAmount)] : undefined,
     query: {

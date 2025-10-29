@@ -13,7 +13,7 @@ import { useBondingCurveStore } from "@/lib/store";
 import { useCreateBondingCurve } from "@/hooks/useCreateBondingCurve";
 import { useX402Payment } from "@/hooks/useX402Payment";
 import { verifyDeploymentPayment } from "@/app/actions";
-import { PaymentRequirements } from "@thebadmandev/x402/types";
+import { PaymentRequirements } from "x402/types";
 import { copyToClipboard } from "@/lib/utils";
 import { toast } from "sonner";
 import { formatUnits, parseEther } from "viem";
@@ -33,14 +33,14 @@ export function DeployStep() {
   // Payment requirements for deployment
   const paymentRequirements: PaymentRequirements = {
     scheme: "exact",
-    network: "sepolia",
-    maxAmountRequired: "1000000", // 1 USDC (6 decimals)
+    network: "base-sepolia",
+    maxAmountRequired: "1000000", // 1 USDC
     resource: "bonding-curve-deployment",
     description: "Payment for bonding curve deployment",
     mimeType: "application/json",
     payTo: "0x02F6302D1b7C94FF01a2B59ebAC8d9aa2fc62522",
     maxTimeoutSeconds: 300,
-    asset: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238", // USDC on Sepolia
+    asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
     outputSchema: undefined,
     extra: {
       name: "USDC",
@@ -117,9 +117,7 @@ export function DeployStep() {
       setDeployProgress(25);
 
       const params = {
-        vaultAddress:
-          "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
-        feeVaultAddress:
+        strategyExecutorAddress:
           "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
         threshold: parseEther("10000"),
         bcParams: {

@@ -18,12 +18,12 @@ export function useMarketCap(fundingManager?: `0x${string}`) {
         const [reserveBalanceWeiRaw, reserveRatioRaw] = await Promise.all([
           readContract(wagmiConfig, {
             address: fundingManager,
-            abi: abis.FM_BC_Bancor_Gaia_v1,
+            abi: abis.FM_BC_Bancor_Launchpad_v1,
             functionName: "getVirtualCollateralSupply",
           }),
           readContract(wagmiConfig, {
             address: fundingManager,
-            abi: abis.FM_BC_Bancor_Gaia_v1,
+            abi: abis.FM_BC_Bancor_Launchpad_v1,
             functionName: "getReserveRatioForBuying",
           }),
         ]);
@@ -54,12 +54,12 @@ export function useMultipleMarketCaps(fundingManagers: `0x${string}`[] = []) {
             const [reserveBalanceWeiRaw, reserveRatioRaw] = await Promise.all([
               readContract(wagmiConfig, {
                 address,
-                abi: abis.FM_BC_Bancor_Gaia_v1,
+                abi: abis.FM_BC_Bancor_Launchpad_v1,
                 functionName: "getVirtualCollateralSupply",
               }),
               readContract(wagmiConfig, {
                 address,
-                abi: abis.FM_BC_Bancor_Gaia_v1,
+                abi: abis.FM_BC_Bancor_Launchpad_v1,
                 functionName: "getReserveRatioForBuying",
               }),
             ]);

@@ -1,12 +1,13 @@
 import { usePublicClient } from "wagmi";
-import { sepolia } from "viem/chains";
 import { abis } from "@/lib/abis";
 import { useCallback, useState } from "react";
 import { useZeroDev } from "@/providers/ZeroDev";
 import { parseEther } from "viem";
+import { contractAddress } from "@/lib/contractAddress";
+import { baseSepolia } from "viem/chains";
 
-const GAIA_TOKEN_ADDRESS = "0x525470415c0958a749888d4f2e872ef1cf0a73c1" as const;
-const MINT_AMOUNT = parseEther("100000"); // 100,000 tokens
+const COLLATERAL_TOKEN_ADDRESS = contractAddress[baseSepolia.id].CollateralToken; 
+const MINT_AMOUNT = parseEther("100000");
 
 export function useMintTokens() {
   const publicClient = usePublicClient();
@@ -35,7 +36,7 @@ export function useMintTokens() {
       // Mint 100,000 tokens to the user's smart account using ZeroDev (gasless)
       // @ts-expect-error - ZeroDev kernel client has account embedded
       const txHash = await kernelClient.writeContract({
-        address: GAIA_TOKEN_ADDRESS,
+        address: COLLATERAL_TOKEN_ADDRESS,
         abi: abis.ERC20Mint,
         functionName: "mint",
         args: [smartAccountAddress as `0x${string}`, MINT_AMOUNT],
@@ -67,6 +68,6 @@ export function useMintTokens() {
     isInitializing,
     smartAccountAddress,
     mintAmount: MINT_AMOUNT,
-    tokenAddress: GAIA_TOKEN_ADDRESS,
+    tokenAddress: COLLATERAL_TOKEN_ADDRESS,
   };
 }

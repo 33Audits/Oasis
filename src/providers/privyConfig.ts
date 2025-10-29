@@ -1,4 +1,5 @@
 import type { PrivyClientConfig } from "@privy-io/react-auth";
+import { baseSepolia } from "viem/chains";
 
 export const privyConfig: PrivyClientConfig = {
   embeddedWallets: {
@@ -11,7 +12,10 @@ export const privyConfig: PrivyClientConfig = {
       secondary: "native-token",
     },
   },
-  loginMethods: ["wallet", "email", "sms"],
+  defaultChain: baseSepolia,
+  supportedChains: [baseSepolia],
+
+  loginMethods: ["wallet"],
   appearance: {
     showWalletLoginFirst: true,
     theme: "#010101",

@@ -36,13 +36,13 @@ export function MintTokensModal() {
             <DialogTitle>Low Balance Detected</DialogTitle>
           </div>
           <DialogDescription>
-            Your smart account has zero balance. You need GAIA tokens to create
+            Your smart account has zero balance. You need Collateral Tokens to create
             a bonding curve. Mint some tokens to get started!
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4 py-4">
           <p className="text-sm text-muted-foreground text-center">
-            Mint 100,000 GAIA tokens to your account for free.
+            Mint 100,000 Collateral Tokens to your account for free.
           </p>
           <MintTokensButton onMintSuccess={handleMintSuccess} />
         </div>

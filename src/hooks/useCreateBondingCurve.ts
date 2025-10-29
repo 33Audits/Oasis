@@ -1,5 +1,5 @@
 import { useReadContract } from "wagmi";
-import { sepolia } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { useCallback, useState } from "react";
@@ -18,16 +18,15 @@ export function useCreateBondingCurve() {
   const { kernelClient, isInitializing } = useZeroDev();
 
   const { data: minDepositAmount } = useReadContract({
-    address: contractAddress[sepolia.id].LM_Gaia_BC_Factory_v1,
-    abi: abis.LM_Gaia_BC_Factory_v1,
+    address: contractAddress[baseSepolia.id].Orchestrator_v1__LaunchpadFactory,
+    abi: abis.LM_Launchpad_BC_Factory_v1,
     functionName: "minAmount",
   });
 
   const createBondingCurve = useCallback(
     async (params: {
-      vaultAddress: `0x${string}`;
-      feeVaultAddress: `0x${string}`;
       threshold: bigint;
+      strategyExecutorAddress: `0x${string}`;
       bcParams: {
         reserveRatioForBuying: number;
         reserveRatioForSelling: number;
@@ -67,7 +66,7 @@ export function useCreateBondingCurve() {
           abi: abis.ERC20Mint,
           functionName: "approve",
           args: [
-            contractAddress[sepolia.id].FM_ExpectingPayment_v1,
+            contractAddress[baseSepolia.id].FM_ExpectingPayment_v1,
             params.stakeAmount,
           ],
         });
@@ -79,12 +78,11 @@ export function useCreateBondingCurve() {
         });
 
         const createBCCallData = encodeFunctionData({
-          abi: abis.LM_Gaia_BC_Factory_v1,
+          abi: abis.LM_Launchpad_BC_Factory_v1,
           functionName: "createBCWorkflow",
           args: [
-            params.vaultAddress,
-            params.feeVaultAddress,
             params.threshold,
+            params.strategyExecutorAddress,
             params.bcParams,
             params.issuanceTokenParams,
           ],
@@ -94,17 +92,17 @@ export function useCreateBondingCurve() {
         const userOpHash = await kernelClient.sendUserOperation({
           callData: await kernelClient.account.encodeCalls([
             {
-              to: contractAddress[sepolia.id].FakeGaiaToken,
+              to: contractAddress[baseSepolia.id].CollateralToken,
               value: BigInt(0),
               data: approveCallData,
             },
             {
-              to: contractAddress[sepolia.id].FM_ExpectingPayment_v1,
+              to: contractAddress[baseSepolia.id].FM_ExpectingPayment_v1,
               value: BigInt(0),
               data: depositCallData,
             },
             {
-              to: contractAddress[sepolia.id].LM_Gaia_BC_Factory_v1,
+              to: contractAddress[baseSepolia.id].LM_Launchpad_BC_Factory_v1,
               value: BigInt(0),
               data: createBCCallData,
             },
@@ -122,7 +120,7 @@ export function useCreateBondingCurve() {
         });
 
         const [bondingCurveEvent] = parseEventLogs({
-          abi: abis.LM_Gaia_BC_Factory_v1,
+          abi: abis.LM_Launchpad_BC_Factory_v1,
           eventName: "BondingCurveCreated",
           logs: receipt.logs,
         });

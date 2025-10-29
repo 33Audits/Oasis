@@ -52,7 +52,7 @@ export function useSellFromBondingCurve() {
         // @ts-expect-error - ZeroDev kernel client has account embedded
         const txid = await kernelClient.writeContract({
           address: params.bcAddress,
-          abi: abis.FM_BC_Bancor_Gaia_v1,
+          abi: abis.FM_BC_Bancor_Launchpad_v1,
           functionName: "sellTo",
           args: [params.receiver, params.depositAmount, params.minAmountOut],
           gas: BigInt(2100000),

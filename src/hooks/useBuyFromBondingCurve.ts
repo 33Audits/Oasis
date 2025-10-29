@@ -1,5 +1,5 @@
 import { usePublicClient } from "wagmi";
-import { sepolia } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { useCallback, useState } from "react";
@@ -33,7 +33,7 @@ export function useBuyFromBondingCurve() {
       // Approve token spending using ZeroDev (gasless)
       // @ts-expect-error - ZeroDev kernel client has account embedded
       const approveTxHash = await kernelClient.writeContract({
-        address: contractAddress[sepolia.id].FakeGaiaToken,
+        address: contractAddress[baseSepolia.id].CollateralToken,
         abi: abis.ERC20Mint,
         functionName: "approve",
         args: [params.bcAddress, params.depositAmount],
@@ -48,7 +48,7 @@ export function useBuyFromBondingCurve() {
       // @ts-expect-error - ZeroDev kernel client has account embedded
       const txid = await kernelClient.writeContract({
         address: params.bcAddress,
-        abi: abis.FM_BC_Bancor_Gaia_v1,
+        abi: abis.FM_BC_Bancor_Launchpad_v1,
         functionName: "buyFor",
         args: [params.receiver, params.depositAmount, params.minAmountOut],
         gas: BigInt(2100000),
