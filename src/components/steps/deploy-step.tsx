@@ -13,9 +13,9 @@ import { useBondingCurveStore } from "@/lib/store";
 import { useCreateBondingCurve } from "@/hooks/useCreateBondingCurve";
 import { useX402Payment } from "@/hooks/useX402Payment";
 import { verifyDeploymentPayment } from "@/app/actions";
-import { PaymentRequirements } from "x402/types";
 import { copyToClipboard } from "@/lib/utils";
 import { toast } from "sonner";
+import { DEPLOYMENT_PAYMENT_REQUIREMENTS } from "@/lib/constants";
 import { formatUnits, parseEther } from "viem";
 
 export function DeployStep() {
@@ -29,24 +29,6 @@ export function DeployStep() {
   const { createBondingCurve, minDepositAmount, bcWorkflowAddress, isLoading, isInitializing } =
     useCreateBondingCurve();
   const { processPayment, isProcessing: isPaymentProcessing, userAddress } = useX402Payment();
-
-  // Payment requirements for deployment
-  const paymentRequirements: PaymentRequirements = {
-    scheme: "exact",
-    network: "base-sepolia",
-    maxAmountRequired: "1000000", // 1 USDC
-    resource: "bonding-curve-deployment",
-    description: "Payment for bonding curve deployment",
-    mimeType: "application/json",
-    payTo: "0x02F6302D1b7C94FF01a2B59ebAC8d9aa2fc62522",
-    maxTimeoutSeconds: 300,
-    asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-    outputSchema: undefined,
-    extra: {
-      name: "USDC",
-      version: "2",
-    },
-  };
 
   const handleInputChange = (field: string, value: string) => {
     if (field === "stakeAmount") {
@@ -89,7 +71,7 @@ export function DeployStep() {
 
       let paymentResult;
       try {
-        paymentResult = await processPayment(paymentRequirements);
+        paymentResult = await processPayment(DEPLOYMENT_PAYMENT_REQUIREMENTS);
       } catch (paymentError) {
         setPaymentStatus("failed");
         throw new Error("Payment signature cancelled or failed");
@@ -198,7 +180,7 @@ export function DeployStep() {
                   htmlFor="stakeAmount"
                   className="text-sm font-medium text-foreground"
                 >
-                  Stake Amount (GAIA Tokens)
+                  Stake Amount (LAUNCHPAD Tokens)
                 </Label>
                 <Input
                   id="stakeAmount"
@@ -214,7 +196,7 @@ export function DeployStep() {
                   {minDepositAmount
                     ? formatUnits(minDepositAmount, 18)
                     : "Loading..."}{" "}
-                  GAIA tokens
+                  LAUNCHPAD tokens
                 </p>
               </div>
             </CardContent>
@@ -366,7 +348,7 @@ export function DeployStep() {
                   </h3>
                   <p className="text-neutral-400 text-sm">
                     {formData.stakeAmount
-                      ? `${formatUnits(BigInt(formData.stakeAmount), 18)} GAIA`
+                      ? `${formatUnits(BigInt(formData.stakeAmount), 18)} LAUNCHPAD`
                       : "Not set"}
                   </p>
                 </div>

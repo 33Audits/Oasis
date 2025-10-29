@@ -1,7 +1,7 @@
 import { PaymentRequirements } from "x402/types";
 
-export const GRAPHQL_URL = 'https://api.studio.thegraph.com/query/72134/mosaic-subgraph/v0.0.7';
-
+export const GRAPHQL_URL = 'https://api.studio.thegraph.com/query/72134/rodeo-subgraph/v0.0.3';
+export const EXPLORER_URL = "https://sepolia.basescan.org";
 /**
  * Payment requirements for bonding curve deployment using x402
  * 1 USDC payment to cover deployment costs

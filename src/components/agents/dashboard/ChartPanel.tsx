@@ -23,6 +23,7 @@ import { useBondingCurveTransactions } from "@/hooks/useBondingCurveTransactions
 import { formatEther } from "viem";
 import { useCandles, type AllCandles } from "@/hooks/useCandles";
 import React from "react";
+import { EXPLORER_URL } from "@/lib/constants";
 
 const chartConfig = {
   close: {
@@ -132,7 +133,7 @@ export function ChartPanel({
                       {shortenTokenAddress(bondingCurveData.tokenAddress)}
                     </span>
                     <Link
-                      href={`https://sepolia.etherscan.io/token/${bondingCurveData.tokenAddress}`}
+                      href={`${EXPLORER_URL}/token/${bondingCurveData.tokenAddress}`}
                       target="_blank"
                     >
                       <ExternalLink className="h-4 w-4 text-neutral-400" />
@@ -303,7 +304,7 @@ export function ChartPanel({
                 <div className="grid grid-cols-6 gap-4 text-xs text-neutral-400 border-b border-border pb-2">
                   <div>Account</div>
                   <div>Type</div>
-                  <div>Amount (GAIA)</div>
+                  <div>Amount (LAUNCHPAD)</div>
                   <div>Amount ({bondingCurveData?.tokenSymbol})</div>
                   <div>Time</div>
                   <div>Txn</div>
@@ -337,7 +338,7 @@ export function ChartPanel({
                       >
                         <div className="font-mono inline-flex items-center gap-2">
                           <Link
-                            href={`https://sepolia.etherscan.io/address/${transaction.user}`}
+                            href={`${EXPLORER_URL}/address/${transaction.user}`}
                             target="_blank"
                             className="hover:text-primary"
                           >
@@ -370,7 +371,7 @@ export function ChartPanel({
                         <div>{timeAgo}</div>
                         <div className="font-mono flex items-center gap-2">
                           <Link
-                            href={`https://sepolia.etherscan.io/tx/${transaction.transactionHash}`}
+                            href={`${EXPLORER_URL}/tx/${transaction.transactionHash}`}
                             target="_blank"
                             className="flex-1 hover:text-primary"
                           >

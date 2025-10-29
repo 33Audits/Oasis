@@ -29,7 +29,7 @@ export function MintTokensModal() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md ">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="h-5 w-5 text-yellow-500" />

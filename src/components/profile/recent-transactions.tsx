@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { EXPLORER_URL } from "@/lib/constants";
 import {
   Table,
   TableBody,
@@ -67,7 +67,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                 </TableCell>
                 <TableCell className="text-neutral-400 font-mono ">
                   <Link
-                    href={`https://sepolia.etherscan.io/tx/${tx.transactionHash}`}
+                    href={`${EXPLORER_URL}/tx/${tx.transactionHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 hover:text-primary"

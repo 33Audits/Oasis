@@ -1,17 +1,16 @@
-import { usePublicClient } from "wagmi";
-import { sepolia } from "viem/chains";
+import { usePublicClient, useWalletClient, useAccount } from "wagmi";
+import { baseSepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { useCallback, useState } from "react";
-import { useZeroDev } from "@/providers/ZeroDev";
 
 
 export function useSellFromBondingCurve() {
   const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
+  const { address, isConnected } = useAccount();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
-  const { kernelClient, isInitializing } = useZeroDev();
 
 
   const sellFromBondingCurve = useCallback(
@@ -30,44 +29,56 @@ export function useSellFromBondingCurve() {
           throw new Error("Public client not available");
         }
 
-        if (!kernelClient) {
-          throw new Error("Smart account not initialized. Please wait...");
+        if (!walletClient) {
+          throw new Error("Wallet not connected");
         }
 
-        // Approve token spending using ZeroDev (gasless)
-        // @ts-expect-error - ZeroDev kernel client has account embedded
-        const approveTxHash = await kernelClient.writeContract({
+        if (!isConnected || !address) {
+          throw new Error("Please connect your wallet");
+        }
+
+        // Approve token spending
+        const approveTxHash = await walletClient.writeContract({
           address: params.tokenAddress,
           abi: abis.ERC20Mint,
           functionName: "approve",
           args: [params.bcAddress, params.depositAmount],
+          account: address,
+          chain: baseSepolia,
         });
 
-        await publicClient.waitForTransactionReceipt({
-          hash: approveTxHash,
-          confirmations: 1,
-        });
-
-        // Sell tokens using ZeroDev (gasless)
-        // @ts-expect-error - ZeroDev kernel client has account embedded
-        const txid = await kernelClient.writeContract({
+        // Sell tokens (don't wait for approve confirmation to bundle)
+        const sellTxHash = await walletClient.writeContract({
           address: params.bcAddress,
           abi: abis.FM_BC_Bancor_Launchpad_v1,
           functionName: "sellTo",
           args: [params.receiver, params.depositAmount, params.minAmountOut],
+          account: address,
+          chain: baseSepolia,
           gas: BigInt(2100000),
         });
 
-        const receipt = await publicClient.waitForTransactionReceipt({
-          hash: txid,
-          confirmations: 1,
-        });
+        // Wait for both transactions in parallel
+        const [approveReceipt, sellReceipt] = await Promise.all([
+          publicClient.waitForTransactionReceipt({
+            hash: approveTxHash,
+            confirmations: 1,
+          }),
+          publicClient.waitForTransactionReceipt({
+            hash: sellTxHash,
+            confirmations: 1,
+          }),
+        ]);
 
-        if (receipt.status !== "success") {
-          throw new Error("Transaction failed: " + receipt.status);
+        if (approveReceipt.status !== "success") {
+          throw new Error("Approval transaction failed");
         }
 
-        return { txid, receipt };
+        if (sellReceipt.status !== "success") {
+          throw new Error("Sell transaction failed");
+        }
+
+        return { txid: sellTxHash, receipt: sellReceipt, approveTxHash, approveReceipt };
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setError(error);
@@ -76,8 +87,8 @@ export function useSellFromBondingCurve() {
         setIsLoading(false);
       }
     },
-    [kernelClient, publicClient]
+    [walletClient, publicClient, address, isConnected]
   );
 
-  return { sellFromBondingCurve, isLoading, error, isInitializing };
+  return { sellFromBondingCurve, isLoading, error, isConnected };
 }

@@ -18,7 +18,7 @@ export function MintTokensButton({ onMintSuccess }: MintTokensButtonProps) {
     try {
       const result = await mintTokens();
       toast.success("Tokens Minted Successfully!", {
-        description: `You received ${formatEther(mintAmount)} GAIA tokens`,
+        description: `You received ${formatEther(mintAmount)} LAUNCHPAD tokens`,
       });
       console.log("Mint transaction:", result);
       

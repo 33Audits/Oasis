@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useSellFromBondingCurve } from "@/hooks/useSellFromBondingCurve";
 import { useQueryClient } from "@tanstack/react-query";
+import { EXPLORER_URL } from "@/lib/constants";
 
 interface TradingPanelProps {
   agentData: {
@@ -99,7 +100,7 @@ export function TradingPanel({
         <div className="flex flex-col gap-1">
           <div>Successfully bought tokens!</div>
           <Link
-            href={`https://sepolia.etherscan.io/tx/${result.txid}`}
+            href={`${EXPLORER_URL}/tx/${result.txid}`}
             target="_blank"
             className="text-blue-400 hover:text-blue-300 underline text-sm"
           >
@@ -152,7 +153,7 @@ export function TradingPanel({
         <div className="flex flex-col gap-1">
           <div>Successfully sold tokens!</div>
           <Link
-            href={`https://sepolia.etherscan.io/tx/${result.txid}`}
+            href={`${EXPLORER_URL}/tx/${result.txid}`}
             target="_blank"
             className="text-blue-400 hover:text-blue-300 underline text-sm"
           >
@@ -225,7 +226,7 @@ export function TradingPanel({
                   className="text-lg md:text-xl h-12 md:h-14 pl-4 pr-12 md:pr-16 border-2 focus:border-green-500 transition-colors [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                 />
                 <div className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 text-xs md:text-sm text-neutral-400 font-medium">
-                  GAIA
+                  LAUNCHPAD
                 </div>
               </div>
 
@@ -248,7 +249,7 @@ export function TradingPanel({
                     className="h-8 md:h-10 text-xs md:text-sm hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-colors"
                     onClick={() => setBuyAmount(amount)}
                   >
-                    {amount} GAIA
+                    {amount} LP
                   </Button>
                 ))}
               </div>
@@ -311,7 +312,7 @@ export function TradingPanel({
               </div>
 
               <div className="text-xs md:text-sm text-neutral-400 text-center">
-                ≈ $GAIA {" "}
+                ≈ $LAUNCHPAD {" "}
                 {saleReturn
                   ? Number(formatEther(saleReturn)).toLocaleString(
                       undefined,
@@ -346,7 +347,7 @@ export function TradingPanel({
                             { maximumFractionDigits: 5 }
                           )
                         : "0"}{" "}
-                      GAIA
+                      LAUNCHPAD
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-1">

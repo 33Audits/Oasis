@@ -15,14 +15,12 @@ import {
 } from "lucide-react";
 import { FaMicrochip } from "react-icons/fa6";
 import { usePrivy } from "@privy-io/react-auth";
-import {
-  OverviewStats,
-  RecentTransactions,
-} from "@/components/profile";
+import { OverviewStats, RecentTransactions } from "@/components/profile";
 import { useCreatorData } from "@/hooks/useCreatorData";
 import { useMultipleMarketCaps } from "@/hooks/useMarketCap";
 import { formatCompactNumber } from "@/lib/utils";
 import Image from "next/image";
+import { useZeroDev } from "@/providers/ZeroDev";
 
 export default function ProfileDashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -30,61 +28,105 @@ export default function ProfileDashboard() {
   const { user } = usePrivy();
   const walletAddress = user?.wallet?.address as `0x${string}` | undefined;
 
-  const { data: creatorData, isLoading, error } = useCreatorData(walletAddress as `0x${string}`);
+  const { smartAccountAddress } = useZeroDev();
 
-  const fundingManagerAddresses = creatorData?.bondingCurves?.map((curve: unknown) =>
-    (curve as any).fundingManagerAddress as `0x${string}`
-  ).filter(Boolean) || [];
+  const {
+    data: walletData,
+    isLoading,
+    error,
+  } = useCreatorData(
+    (walletAddress as `0x${string}`)
+  );
+
+  const { data: smartAccountData } = useCreatorData(
+    smartAccountAddress as `0x${string}`
+  );
+
+  const creatorData = {
+    bondingCurves: [
+      ...(walletData?.bondingCurves || []),
+      ...(smartAccountData?.bondingCurves || []),
+    ],
+    transactions: [
+      ...(walletData?.transactions || []),
+      ...(smartAccountData?.transactions || []),
+    ],
+  };
+
+  const fundingManagerAddresses =
+    creatorData?.bondingCurves
+      ?.map(
+        (curve: unknown) =>
+          (curve as any).fundingManagerAddress as `0x${string}`
+      )
+      .filter(Boolean) || [];
 
   const { data: marketCaps } = useMultipleMarketCaps(fundingManagerAddresses);
 
-  const projects = creatorData?.bondingCurves?.map((curve: unknown, index: number) => {
-    const fundingManagerAddress = (curve as any).fundingManagerAddress as `0x${string}`;
-    const marketCap = marketCaps?.[fundingManagerAddress];
-    const displayMarketCap =  marketCap !== null && marketCap !== undefined
-      ? `$${formatCompactNumber(marketCap)}`
-      : `$${formatCompactNumber(((curve as any).totalBuyVolume) / 1e18)}`;
+  const projects =
+    creatorData?.bondingCurves?.map((curve: unknown, index: number) => {
+      const fundingManagerAddress = (curve as any)
+        .fundingManagerAddress as `0x${string}`;
+      const marketCap = marketCaps?.[fundingManagerAddress];
+      const displayMarketCap =
+        marketCap !== null && marketCap !== undefined
+          ? `$${formatCompactNumber(marketCap)}`
+          : `$${formatCompactNumber((curve as any).totalBuyVolume / 1e18)}`;
 
-    return {
-      id: index + 1,
-      name: ((curve as any).tokenName || `Token ${index + 1}`),
-      symbol: ((curve as any).tokenSymbol || `T${index + 1}`),
-      address: (curve as any).orchestratorAddress,
-      marketCap: displayMarketCap,
-      holders: `${(curve as any).holderCount} holders`,
-      holderCount: (curve as any).holderCount,
-      createdAt: new Date(Number((curve as any).createdAt) * 1000).toLocaleDateString(),
-      status: ((curve as any).holderCount > 0 ? "Active" : "Inactive"),
-      currentPrice: `$${(Number((curve as any).currentPrice) / 1e18).toFixed(4)}`,
-    };
-  }) || [];
-
+      return {
+        id: index + 1,
+        name: (curve as any).tokenName || `Token ${index + 1}`,
+        symbol: (curve as any).tokenSymbol || `T${index + 1}`,
+        address: (curve as any).orchestratorAddress,
+        marketCap: displayMarketCap,
+        holders: `${(curve as any).holderCount} holders`,
+        holderCount: (curve as any).holderCount,
+        createdAt: new Date(
+          Number((curve as any).createdAt) * 1000
+        ).toLocaleDateString(),
+        status: (curve as any).holderCount > 0 ? "Active" : "Inactive",
+        currentPrice: `$${(Number((curve as any).currentPrice) / 1e18).toFixed(
+          4
+        )}`,
+      };
+    }) || [];
 
   // Transform transactions data
-  const transactions = creatorData?.transactions?.map((tx: unknown, index: number) => ({
-    id: index + 1,
-    time: new Date(Number((tx as any).blockTimestamp) * 1000).toLocaleString(),
-    agent: (tx as any).transactionType,
-    type: (tx as any).transactionType,
-    assets: (tx as any).tokenAmount ? `${(Number((tx as any).tokenAmount) / 1e18).toFixed(4)} ${((tx as any)?.bondingCurve?.tokenSymbol)}` : "N/A",
-    value: (tx as any).paymentAmount ? `$${(Number((tx as any).paymentAmount) / 1e18).toFixed(2)} GAIA` : "N/A",
-    transactionHash: (tx as any).transactionHash,
-  })) || [];
+  const transactions =
+    creatorData?.transactions?.map((tx: unknown, index: number) => ({
+      id: index + 1,
+      time: new Date(
+        Number((tx as any).blockTimestamp) * 1000
+      ).toLocaleString(),
+      agent: (tx as any).transactionType,
+      type: (tx as any).transactionType,
+      assets: (tx as any).tokenAmount
+        ? `${(Number((tx as any).tokenAmount) / 1e18).toFixed(4)} ${
+            (tx as any)?.bondingCurve?.tokenSymbol
+          }`
+        : "N/A",
+      value: (tx as any).paymentAmount
+        ? `$${(Number((tx as any).paymentAmount) / 1e18).toFixed(2)} LAUNCHPAD`
+        : "N/A",
+      status: "completed",
+      transactionHash: (tx as any).transactionHash,
+    })) || [];
 
-  const totalValue = fundingManagerAddresses.reduce((sum: number, address: `0x${string}`) => {
-    const marketCap = marketCaps?.[address];
-    if (marketCap !== null && marketCap !== undefined) {
-      return sum + marketCap;
-    }
-    
-    const curveData = creatorData?.bondingCurves?.find((c: unknown) =>
-      (c as any).fundingManagerAddress === address
-    );
-    if (curveData) {
-      return sum + Number((curveData as any).totalBuyVolume) / 1e18;
-    }
-    return sum;
-  }, 0) || 0;
+  const totalValue =
+    fundingManagerAddresses.reduce((sum: number, address: `0x${string}`) => {
+      const marketCap = marketCaps?.[address];
+      if (marketCap !== null && marketCap !== undefined) {
+        return sum + marketCap;
+      }
+
+      const curveData = creatorData?.bondingCurves?.find(
+        (c: unknown) => (c as any).fundingManagerAddress === address
+      );
+      if (curveData) {
+        return sum + Number((curveData as any).totalBuyVolume) / 1e18;
+      }
+      return sum;
+    }, 0) || 0;
 
   const activeCurves = projects.length;
   const totalHolders = projects.reduce((sum: number, project: unknown) => {
@@ -129,14 +171,20 @@ export default function ProfileDashboard() {
       {/* Sidebar */}
       <div
         className={`fixed top-16 left-0 min-h-screen bg-neutral-950 border-r border-neutral-800 z-40 transition-all duration-300 ease-in-out ${
-          sidebarCollapsed ? "w-16 -translate-x-full md:w-16 md:translate-x-0" : "w-64 translate-x-0"
+          sidebarCollapsed
+            ? "w-16 -translate-x-full md:w-16 md:translate-x-0"
+            : "w-64 translate-x-0"
         } ${sidebarCollapsed ? "md:block" : "block"}`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className={`border-b border-neutral-800 flex items-center ${
-            sidebarCollapsed ? "justify-center p-3" : "justify-between p-3 sm:p-4"
-          }`}>
+          <div
+            className={`border-b border-neutral-800 flex items-center ${
+              sidebarCollapsed
+                ? "justify-center p-3"
+                : "justify-between p-3 sm:p-4"
+            }`}
+          >
             {sidebarCollapsed ? (
               <Button
                 variant="ghost"
@@ -165,13 +213,17 @@ export default function ProfileDashboard() {
 
           {/* Navigation */}
           <nav className={`flex-1 ${sidebarCollapsed ? "p-2" : "p-3 sm:p-4"}`}>
-            <ul className={`space-y-1 ${sidebarCollapsed ? "" : "sm:space-y-2"}`}>
+            <ul
+              className={`space-y-1 ${sidebarCollapsed ? "" : "sm:space-y-2"}`}
+            >
               {navigationItems.map((item) => (
                 <li key={item.name}>
                   <button
                     onClick={() => handleNavClick(item.section)}
                     className={`w-full flex items-center ${
-                      sidebarCollapsed ? "justify-center px-2" : "gap-2 sm:gap-3 px-2 sm:px-3 justify-start"
+                      sidebarCollapsed
+                        ? "justify-center px-2"
+                        : "gap-2 sm:gap-3 px-2 sm:px-3 justify-start"
                     } py-2 rounded-lg transition-colors text-left ${
                       activeNav === item.section
                         ? "bg-neutral-800 border border-neutral-700 text-blue-400"
@@ -179,11 +231,15 @@ export default function ProfileDashboard() {
                     }`}
                     title={sidebarCollapsed ? item.name : ""}
                   >
-                    <item.icon className={`${
-                      sidebarCollapsed ? "w-5 h-5" : "w-4 h-4 sm:w-5 sm:h-5"
-                    } flex-shrink-0`} />
+                    <item.icon
+                      className={`${
+                        sidebarCollapsed ? "w-5 h-5" : "w-4 h-4 sm:w-5 sm:h-5"
+                      } flex-shrink-0`}
+                    />
                     {!sidebarCollapsed && (
-                      <span className="text-sm sm:text-base truncate">{item.name}</span>
+                      <span className="text-sm sm:text-base truncate">
+                        {item.name}
+                      </span>
                     )}
                   </button>
                 </li>
@@ -194,9 +250,11 @@ export default function ProfileDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col overflow-y-auto transition-all duration-300 ${
-        sidebarCollapsed ? "ml-0 md:ml-16" : "ml-0 md:ml-64"
-      }`}>
+      <div
+        className={`flex-1 flex flex-col overflow-y-auto transition-all duration-300 ${
+          sidebarCollapsed ? "ml-0 md:ml-16" : "ml-0 md:ml-64"
+        }`}
+      >
         {/* Header */}
         <header className="bg-neutral-950 border-b border-neutral-800 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
@@ -263,30 +321,46 @@ export default function ProfileDashboard() {
             <div id="projects" className="pt-6 sm:pt-8">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="text-neutral-400">Loading bonding curves...</div>
+                  <div className="text-neutral-400">
+                    Loading bonding curves...
+                  </div>
                 </div>
               ) : error ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="text-red-400">Error loading bonding curves: {error.message}</div>
+                  <div className="text-red-400">
+                    Error loading bonding curves: {error.message}
+                  </div>
                 </div>
               ) : projects.length === 0 ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="text-neutral-400">No bonding curves found</div>
+                  <div className="text-neutral-400">
+                    No bonding curves found
+                  </div>
                 </div>
               ) : (
                 <div className="max-w-7xl mx-auto w-full container space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
                   <div className="flex flex-wrap gap-4 items-center justify-between mb-12">
-                    <h2 className="text-3xl md:text-5xl font-normal text-white">My Bonding Curves</h2>
+                    <h2 className="text-3xl md:text-5xl font-normal text-white">
+                      My Bonding Curves
+                    </h2>
                   </div>
 
                   <div className="border border-neutral-800 p-4 rounded-xl">
                     <table className="w-full">
                       <thead>
                         <tr className="border-neutral-700">
-                          <th className="w-[200px] text-left text-neutral-300 p-2">Token</th>
-                          <th className="w-[100px] text-left text-neutral-300 p-2">Symbol</th>
-                          <th className="w-[120px] text-left text-neutral-300 p-2">Market Cap</th>
-                          <th className="w-[100px] text-left text-neutral-300 p-2">Holders</th>
+                          <th className="w-[200px] text-left text-neutral-300 p-2">
+                            Token
+                          </th>
+                          <th className="w-[100px] text-left text-neutral-300 p-2">
+                            Symbol
+                          </th>
+                          <th className="w-[120px] text-left text-neutral-300 p-2">
+                            Market Cap
+                          </th>
+                          <th className="w-[100px] text-left text-neutral-300 p-2">
+                            Holders
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -294,16 +368,28 @@ export default function ProfileDashboard() {
                           <tr
                             key={(project as any).address}
                             className="border-neutral-700 hover:bg-neutral-800 cursor-pointer"
-                            onClick={() => window.open(`/project/${(project as any).address}`, '_blank')}
+                            onClick={() =>
+                              window.open(
+                                `/project/${(project as any).address}`,
+                                "_blank"
+                              )
+                            }
                           >
                             <td className="p-2">
                               <div className="flex items-center gap-3">
                                 <div className="h-8 w-8 bg-neutral-700 rounded-full flex items-center justify-center">
                                   <span className="text-neutral-300 text-sm">
-                                    <Image src="/33labs.jpg" alt={(project as any).name} width={32} height={32} />
+                                    <Image
+                                      src="/33labs.jpg"
+                                      alt={(project as any).name}
+                                      width={32}
+                                      height={32}
+                                    />
                                   </span>
                                 </div>
-                                <span className="text-neutral-300">{(project as any).name}</span>
+                                <span className="text-neutral-300">
+                                  {(project as any).name}
+                                </span>
                               </div>
                             </td>
                             <td className="p-2 font-mono text-neutral-300">
@@ -320,20 +406,22 @@ export default function ProfileDashboard() {
                       </tbody>
                     </table>
                   </div>
-
                 </div>
               )}
             </div>
 
-
             <div id="transactions" className="pt-6 sm:pt-8">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="text-neutral-400">Loading transactions...</div>
+                  <div className="text-neutral-400">
+                    Loading transactions...
+                  </div>
                 </div>
               ) : error ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="text-red-400">Error loading transactions: {error.message}</div>
+                  <div className="text-red-400">
+                    Error loading transactions: {error.message}
+                  </div>
                 </div>
               ) : (
                 <RecentTransactions transactions={transactions} />
@@ -341,18 +429,28 @@ export default function ProfileDashboard() {
             </div>
 
             {/* Placeholder sections for future implementation */}
-            <div id="knowledge" className="min-h-screen flex items-center justify-center pt-6 sm:pt-8">
+            <div
+              id="knowledge"
+              className="min-h-screen flex items-center justify-center pt-6 sm:pt-8"
+            >
               <div className="text-center text-neutral-400 px-4">
                 <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg sm:text-xl font-semibold mb-2">Knowledge Base</h3>
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">
+                  Knowledge Base
+                </h3>
                 <p className="text-sm sm:text-base">Coming soon...</p>
               </div>
             </div>
 
-            <div id="settings" className="min-h-screen flex items-center justify-center pt-6 sm:pt-8">
+            <div
+              id="settings"
+              className="min-h-screen flex items-center justify-center pt-6 sm:pt-8"
+            >
               <div className="text-center text-neutral-400 px-4">
                 <Settings className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg sm:text-xl font-semibold mb-2">Settings</h3>
+                <h3 className="text-lg sm:text-xl font-semibold mb-2">
+                  Settings
+                </h3>
                 <p className="text-sm sm:text-base">Coming soon...</p>
               </div>
             </div>
