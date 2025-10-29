@@ -121,7 +121,7 @@ export function DeployStep() {
       const params = {
         strategyExecutorAddress:
           "0x5da6bfd31475057af04e2804a03a3b1d06338724" as `0x${string}`,
-        threshold: parseEther("10000"),
+        threshold: parseEther("10000000000000000000000000000"),
         bcParams: {
           reserveRatioForBuying: formData.reserveRatioForBuying,
           reserveRatioForSelling: formData.reserveRatioForSelling,
