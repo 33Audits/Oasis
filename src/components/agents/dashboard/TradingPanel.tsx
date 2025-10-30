@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useSellFromBondingCurve } from "@/hooks/useSellFromBondingCurve";
 import { useQueryClient } from "@tanstack/react-query";
 import { EXPLORER_URL } from "@/lib/constants";
+import { usePrivy } from "@privy-io/react-auth";
 
 interface TradingPanelProps {
   agentData: {
@@ -38,9 +39,8 @@ export function TradingPanel({
   const [isBuying, setIsBuying] = useState(false);
   const [isSelling, setIsSelling] = useState(false);
 
-  // Input validation function
   const isValidAmount = (amount: string): boolean => {
-    if (!amount || amount.trim() === '') return false;
+    if (!amount || amount.trim() === "") return false;
     const num = Number(amount);
     return !isNaN(num) && num > 0 && num <= Number.MAX_SAFE_INTEGER;
   };
@@ -52,14 +52,18 @@ export function TradingPanel({
   const { sellFromBondingCurve, isPending: isSellingPending } =
     useSellFromBondingCurve();
 
+  const { authenticated } = usePrivy();
+
   const { data: purchaseReturn } = useReadContract({
     address: bondingCurveAddress,
     abi: abis.FM_BC_Bancor_Launchpad_v1,
     functionName: "calculatePurchaseReturn",
-    args: buyAmount && isValidAmount(buyAmount) ? [parseEther(buyAmount)] : undefined,
+    args:
+      buyAmount && isValidAmount(buyAmount)
+        ? [parseEther(buyAmount)]
+        : undefined,
     query: {
-      enabled:
-        !!bondingCurveAddress && !!buyAmount && isValidAmount(buyAmount),
+      enabled: !!bondingCurveAddress && !!buyAmount && isValidAmount(buyAmount),
     },
   });
 
@@ -67,7 +71,10 @@ export function TradingPanel({
     address: bondingCurveAddress,
     abi: abis.FM_BC_Bancor_Launchpad_v1,
     functionName: "calculateSaleReturn",
-    args: sellAmount && isValidAmount(sellAmount) ? [parseEther(sellAmount)] : undefined,
+    args:
+      sellAmount && isValidAmount(sellAmount)
+        ? [parseEther(sellAmount)]
+        : undefined,
     query: {
       enabled:
         !!bondingCurveAddress && !!sellAmount && isValidAmount(sellAmount),
@@ -104,16 +111,25 @@ export function TradingPanel({
             target="_blank"
             className="text-blue-400 hover:text-blue-300 underline text-sm"
           >
-            View transaction: {result.txid.slice(0, 10)}...{result.txid.slice(-4)}
+            View transaction: {result.txid.slice(0, 10)}...
+            {result.txid.slice(-4)}
           </Link>
         </div>
       );
 
       // Refresh candles, transactions, market cap, and holders data
-      queryClient.invalidateQueries({ queryKey: ["candles", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["bonding-curve-transactions", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["market-cap", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["token-holders", bondingCurveAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ["candles", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["bonding-curve-transactions", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["market-cap", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["token-holders", bondingCurveAddress],
+      });
 
       // Reset buy amount to default
       setBuyAmount("1");
@@ -157,16 +173,25 @@ export function TradingPanel({
             target="_blank"
             className="text-blue-400 hover:text-blue-300 underline text-sm"
           >
-            View transaction: {result.txid.slice(0, 10)}...{result.txid.slice(-4)}
+            View transaction: {result.txid.slice(0, 10)}...
+            {result.txid.slice(-4)}
           </Link>
         </div>
       );
 
       // Refresh candles, transactions, market cap, and holders data
-      queryClient.invalidateQueries({ queryKey: ["candles", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["bonding-curve-transactions", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["market-cap", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["token-holders", bondingCurveAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ["candles", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["bonding-curve-transactions", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["market-cap", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["token-holders", bondingCurveAddress],
+      });
 
       // Reset sell amount to default
       setSellAmount("0");
@@ -283,7 +308,8 @@ export function TradingPanel({
                   isBuying ||
                   isBuyingPending ||
                   !bondingCurveAddress ||
-                  !purchaseReturn
+                  !purchaseReturn ||
+                  !authenticated
                 }
               >
                 <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-2" />
@@ -312,12 +338,11 @@ export function TradingPanel({
               </div>
 
               <div className="text-xs md:text-sm text-neutral-400 text-center">
-                ≈ $LAUNCHPAD {" "}
+                ≈ $LAUNCHPAD{" "}
                 {saleReturn
-                  ? Number(formatEther(saleReturn)).toLocaleString(
-                      undefined,
-                      { maximumFractionDigits: 5 }
-                    )
+                  ? Number(formatEther(saleReturn)).toLocaleString(undefined, {
+                      maximumFractionDigits: 5,
+                    })
                   : "0"}
               </div>
 
@@ -364,7 +389,8 @@ export function TradingPanel({
                   isSelling ||
                   isSellingPending ||
                   !bondingCurveAddress ||
-                  !sellAmount
+                  !sellAmount ||
+                  !authenticated
                 }
               >
                 <TrendingDown className="w-3 h-3 md:w-4 md:h-4 mr-2" />
