@@ -6,8 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import ConnectWalletButton from "../wallet/connect-wallet-button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Button } from "../ui/button";
-import { usePrivy } from "@privy-io/react-auth";
+import { DeployButton } from "./deploy-button";
 
 const handleNavigation = (
   target: string,
@@ -29,8 +28,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-
-  const { authenticated: isAuthenticated } = usePrivy();
 
   return (
     <header className="sticky top-0 z-50 bg-transparent backdrop-blur-xl">
@@ -73,13 +70,9 @@ export default function Navbar() {
 
           {/* Desktop wallet button */}
           <div className="flex items-center space-x-2">
-            {isAuthenticated && (
-              <Link href="/create" className="hidden md:block">
-                <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-                  Deploy
-                </Button>
-              </Link>
-            )}
+            <div className="hidden md:block">
+              <DeployButton />
+            </div>
 
             <ConnectWalletButton />
 
@@ -137,15 +130,9 @@ export default function Navbar() {
               </button>
             </div>
 
-            {isAuthenticated && (
-              <div className="p-4">
-                <Link href="/create">
-                  <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-                    Deploy
-                  </Button>
-                </Link>
-              </div>
-            )}
+            <div className="p-4">
+              <DeployButton fullWidth />
+            </div>
           </div>
         )}
       </div>

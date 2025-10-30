@@ -277,7 +277,7 @@ export function TradingPanel({
               </div>
 
               <Button
-                className="w-full h-10 md:h-12 bg-green-600 hover:bg-green-700 text-white font-medium text-sm md:text-base"
+                className="w-full h-10 md:h-12 bg-green-600 hover:bg-green-700 text-white font-medium text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleBuy}
                 disabled={
                   isBuying ||
@@ -358,7 +358,7 @@ export function TradingPanel({
               </div>
 
               <Button
-                className="w-full h-10 md:h-12 bg-orange-600 hover:bg-orange-700 text-white font-medium text-sm md:text-base"
+                className="w-full h-10 md:h-12 bg-orange-600 hover:bg-orange-700 text-white font-medium text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleSell}
                 disabled={
                   isSelling ||
@@ -368,7 +368,7 @@ export function TradingPanel({
                 }
               >
                 <TrendingDown className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-                PLACE SELL ORDER
+                {isSelling ? "SELLING..." : "PLACE SELL ORDER"}
               </Button>
             </div>
           </TabsContent>

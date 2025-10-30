@@ -1,6 +1,6 @@
 import { usePublicClient } from "wagmi";
 import { baseSepolia } from "viem/chains";
-import { decodeErrorResult, hexToString } from "viem";
+import { decodeErrorResult } from "viem";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { useCallback, useState } from "react";
@@ -29,6 +29,17 @@ export function useBuyFromBondingCurve() {
 
       if (!kernelClient) {
         throw new Error("Smart account not initialized. Please wait...");
+      }
+
+      // Check if buying is still open before proceeding
+      const buyIsOpen = await publicClient.readContract({
+        address: params.bcAddress,
+        abi: abis.FM_BC_Bancor_Launchpad_v1,
+        functionName: "buyIsOpen",
+      });
+
+      if (!buyIsOpen) {
+        throw new Error("Buying is currently closed. The funding threshold may have been reached.");
       }
 
       // Approve token spending using ZeroDev (gasless)

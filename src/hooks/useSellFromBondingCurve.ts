@@ -18,6 +18,17 @@ export function useSellFromBondingCurve() {
         throw new Error("Public client not available");
       }
 
+      // Check if selling is still open before proceeding
+      const sellIsOpen = await publicClient.readContract({
+        address: params.bcAddress,
+        abi: abis.FM_BC_Bancor_Launchpad_v1,
+        functionName: "sellIsOpen",
+      });
+
+      if (!sellIsOpen) {
+        throw new Error("Selling is currently closed. The funding threshold may have been reached.");
+      }
+
       await writeContractAsync({
         address: params.tokenAddress,
         abi: abis.ERC20Mint,
