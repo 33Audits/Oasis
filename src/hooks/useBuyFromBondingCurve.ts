@@ -1,6 +1,6 @@
 import { usePublicClient } from "wagmi";
 import { baseSepolia } from "viem/chains";
-import { decodeErrorResult } from "viem";
+import { decodeErrorResult, encodeFunctionData } from "viem";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { useCallback, useState } from "react";
@@ -27,7 +27,7 @@ export function useBuyFromBondingCurve() {
         throw new Error("Public client not available");
       }
 
-      if (!kernelClient) {
+      if (!kernelClient || !kernelClient.account) {
         throw new Error("Smart account not initialized. Please wait...");
       }
 
@@ -42,28 +42,38 @@ export function useBuyFromBondingCurve() {
         throw new Error("Buying is currently closed. The funding threshold may have been reached.");
       }
 
-      // Approve token spending using ZeroDev (gasless)
-      // @ts-expect-error - ZeroDev kernel client already has account embedded
-      const approveTxHash = await kernelClient.writeContract({
-        address: contractAddress[baseSepolia.id].CollateralToken,
+      // Batch approve + buy into a single UserOperation to avoid nonce issues
+      const approveCallData = encodeFunctionData({
         abi: abis.ERC20Mint,
         functionName: "approve",
         args: [params.bcAddress, params.depositAmount],
       });
 
-      await publicClient.waitForTransactionReceipt({
-        hash: approveTxHash,
-        confirmations: 1,
-      });
-
-      // Buy tokens using ZeroDev (gasless)
-      // @ts-expect-error - ZeroDev kernel client already has account embedded
-      const txid = await kernelClient.writeContract({
-        address: params.bcAddress,
+      const buyCallData = encodeFunctionData({
         abi: abis.FM_BC_Bancor_Launchpad_v1,
         functionName: "buyFor",
         args: [params.receiver, params.depositAmount, params.minAmountOut],
       });
+
+      const userOpHash = await kernelClient.sendUserOperation({
+        callData: await kernelClient.account.encodeCalls([
+          {
+            to: contractAddress[baseSepolia.id].CollateralToken,
+            data: approveCallData,
+            value: BigInt(0),
+          },
+          {
+            to: params.bcAddress,
+            data: buyCallData,
+            value: BigInt(0),
+          },
+        ]),
+      });
+
+      // Wait for the UserOperation to be included in a transaction
+      const txid = await kernelClient.waitForUserOperationReceipt({
+        hash: userOpHash,
+      }).then((receipt: any) => receipt.receipt.transactionHash);
 
       const receipt = await publicClient.waitForTransactionReceipt({
         hash: txid,

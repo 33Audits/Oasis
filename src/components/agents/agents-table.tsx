@@ -28,7 +28,6 @@ const allColumns = [
 
 function AgentsTable() {
   const { data: details } = useBondingCurveDetails();
-  console.log(details);
 
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
     ...allColumns,
@@ -47,13 +46,12 @@ function AgentsTable() {
       curve.issuanceToken.name.toLowerCase().includes(searchLower) ||
       curve.issuanceToken.symbol.toLowerCase().includes(searchLower)
     );
+  }).sort((a, b) => {
+    const marketCapA = a.marketCap ?? 0;
+    const marketCapB = b.marketCap ?? 0;
+    return marketCapB - marketCapA;
   });
 
-  const toggleColumn = (col: string) => {
-    setVisibleColumns((prev) =>
-      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
-    );
-  };
 
   return (
     <div className="max-w-7xl mx-auto w-full container space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
