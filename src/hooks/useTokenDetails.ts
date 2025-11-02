@@ -18,7 +18,7 @@ export function useTokenDetails(fundingManagerAddress: `0x${string}` | undefined
     enabled: !!fundingManagerAddress,
     queryFn: () => readContract(wagmiConfig, {
       address: fundingManagerAddress!,
-      abi: abis.FM_BC_Bancor_Gaia_v1,
+      abi: abis.FM_BC_Bancor_Launchpad_v1,
       functionName: "getIssuanceToken",
     }),
   });

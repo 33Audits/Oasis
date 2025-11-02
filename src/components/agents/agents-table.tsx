@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { useBondingCurveDetails } from "@/hooks/useBondingCurveDetails";
+import { DeployButton } from "../shared/deploy-button";
 
 const allColumns = [
   "Token",
@@ -27,7 +28,6 @@ const allColumns = [
 
 function AgentsTable() {
   const { data: details } = useBondingCurveDetails();
-  console.log(details);
 
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
     ...allColumns,
@@ -46,13 +46,12 @@ function AgentsTable() {
       curve.issuanceToken.name.toLowerCase().includes(searchLower) ||
       curve.issuanceToken.symbol.toLowerCase().includes(searchLower)
     );
+  }).sort((a, b) => {
+    const marketCapA = a.marketCap ?? 0;
+    const marketCapB = b.marketCap ?? 0;
+    return marketCapB - marketCapA;
   });
 
-  const toggleColumn = (col: string) => {
-    setVisibleColumns((prev) =>
-      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
-    );
-  };
 
   return (
     <div className="max-w-7xl mx-auto w-full container space-y-4 px-4 py-8 bg-background shadow-sm overflow-x-auto">
@@ -65,13 +64,7 @@ function AgentsTable() {
             onChange={(e) => setSearchFilter(e.target.value)}
             className="w-full md:w-64 bg-neutral-800 border-neutral-600 text-white placeholder:text-neutral-400"
           />
-          {isAuthenticated && (
-            <Link href="/create">
-              <Button className="rounded-lg bg-white hover:bg-white/90 text-black font-mono">
-                <span className="">Deploy</span>
-              </Button>
-            </Link>
-          )}
+         < DeployButton />
         </div>
       </div>
 

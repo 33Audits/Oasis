@@ -7,6 +7,7 @@ import { useBondingCurveStore } from "@/lib/store";
 import { TokenParametersStep } from "@/components/steps/token-parameters-step";
 import { BondingCurveStep } from "@/components/steps/bonding-curve-step";
 import { DeployStep } from "@/components/steps/deploy-step";
+import { MintTokensModal } from "@/components/MintTokensModal";
 
 const steps = [
   { id: 1, name: "Token Parameters", component: TokenParametersStep },
@@ -77,6 +78,9 @@ export default function CreateBondingCurvePage() {
           </div>
         </div>
       </div>
+      
+      {/* Mint Tokens Modal - shows when balance is 0 */}
+      <MintTokensModal />
 
       {/* Step Content */}
       <div className="overflow-hidden">

@@ -4,7 +4,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { readContract, readContracts } from "wagmi/actions";
-import { sepolia } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 import { contractAddress } from "@/lib/contractAddress";
 import { abis } from "@/lib/abis";
 import { wagmiConfig } from "@/providers/wagmiConfig";
@@ -31,8 +31,8 @@ export function useBondingCurveDetails() {
   const countQuery = useQuery({
     queryKey: ["bonding-curve-count"],
     queryFn: () => readContract(wagmiConfig, {
-      address: contractAddress[sepolia.id].LM_Gaia_BC_Factory_v1,
-      abi: abis.LM_Gaia_BC_Factory_v1,
+      address: contractAddress[baseSepolia.id].LM_Launchpad_BC_Factory_v1,
+      abi: abis.LM_Launchpad_BC_Factory_v1,
       functionName: "bcWorkflowCount",
     }),
   });
@@ -46,8 +46,8 @@ export function useBondingCurveDetails() {
       if (count === 0) return [];
 
       const contracts = Array.from({ length: count }, (_, i) => ({
-        address: contractAddress[sepolia.id].LM_Gaia_BC_Factory_v1,
-        abi: abis.LM_Gaia_BC_Factory_v1,
+        address: contractAddress[baseSepolia.id].LM_Launchpad_BC_Factory_v1,
+        abi: abis.LM_Launchpad_BC_Factory_v1,
         functionName: "bcWorkflowAddressById" as const,
         args: [BigInt(i)],
       }));
@@ -84,7 +84,7 @@ export function useBondingCurveDetails() {
         .filter(Boolean)
         .map((fundingManagerAddress) => ({
           address: fundingManagerAddress,
-          abi: abis.FM_BC_Bancor_Gaia_v1,
+          abi: abis.FM_BC_Bancor_Launchpad_v1,
           functionName: "getIssuanceToken" as const,
         }));
 
@@ -159,7 +159,7 @@ export function useBondingCurveDetails() {
     queryFn: async () => {
       const contracts: Array<{
         address: `0x${string}`;
-        abi: typeof abis.FM_BC_Bancor_Gaia_v1;
+        abi: typeof abis.FM_BC_Bancor_Launchpad_v1;
         functionName:
           | "getVirtualCollateralSupply"
           | "getReserveRatioForBuying"
@@ -172,12 +172,12 @@ export function useBondingCurveDetails() {
           contracts.push(
             {
               address: fmAddress,
-              abi: abis.FM_BC_Bancor_Gaia_v1,
+              abi: abis.FM_BC_Bancor_Launchpad_v1,
               functionName: "getVirtualCollateralSupply",
             },
             {
               address: fmAddress,
-              abi: abis.FM_BC_Bancor_Gaia_v1,
+              abi: abis.FM_BC_Bancor_Launchpad_v1,
               functionName: "getReserveRatioForBuying",
             }
           );

@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatCompactNumber, shortenTokenAddress } from "@/lib/utils";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { EXPLORER_URL } from "@/lib/constants";
 
 import { useTokenHolders } from "@/hooks/useTokenHolders";
 
@@ -82,7 +83,7 @@ export function AgentSummary({ bondingCurveData }: AgentSummaryProps) {
               {shortenTokenAddress(bondingCurveData.bondingCurveAddress)}
 
               <Link
-                href={`https://sepolia.etherscan.io/token/${bondingCurveData.bondingCurveAddress}`}
+                href={`${EXPLORER_URL}/token/${bondingCurveData.bondingCurveAddress}`}
                 target="_blank"
               >
                 <ExternalLink className="h-4 w-4 text-neutral-400" />

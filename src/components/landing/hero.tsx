@@ -1,11 +1,10 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 import Sponsors from "./sponsors";
+import { DeployButton } from "../shared/deploy-button";
 
 export default function Hero() {
   return (
-    <section className="min-h-screen top-0 relative overflow-hidden" id="home">
+    <section className=" top-0 relative overflow-hidden" id="home">
       <div className="top-0 absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/20" />
       <div className="relative container mx-auto px-4 py-28">
         <div className="text-center space-y-8 max-w-5xl mx-auto">
@@ -24,27 +23,18 @@ export default function Hero() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/create">
-              <Button
-                size="lg"
-                className="flex items-center rounded-xl bg-white hover:bg-white/90 text-black font-mono text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            {/* <Button
-              variant="outline"
+            <DeployButton
               size="lg"
-              className="font-mono text-lg px-8 py-6 hover:bg-muted/50 transition-colors"
+              className="flex items-center rounded-xl bg-white hover:bg-white/90 text-black font-mono text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              tooltipMessage="Connect your wallet to get started"
             >
-              <Zap className="mr-2 h-5 w-5" />
-              View Demo
-            </Button> */}
+              Get Started
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </DeployButton>
           </div>
         </div>
       </div>
-      {/* <Sponsors/> */}
+      <Sponsors/>
     </section>
   );
 }

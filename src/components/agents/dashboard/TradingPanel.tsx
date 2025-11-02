@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useSellFromBondingCurve } from "@/hooks/useSellFromBondingCurve";
 import { useQueryClient } from "@tanstack/react-query";
+import { EXPLORER_URL } from "@/lib/constants";
+import { usePrivy } from "@privy-io/react-auth";
 
 interface TradingPanelProps {
   agentData: {
@@ -37,36 +39,42 @@ export function TradingPanel({
   const [isBuying, setIsBuying] = useState(false);
   const [isSelling, setIsSelling] = useState(false);
 
-  // Input validation function
   const isValidAmount = (amount: string): boolean => {
-    if (!amount || amount.trim() === '') return false;
+    if (!amount || amount.trim() === "") return false;
     const num = Number(amount);
     return !isNaN(num) && num > 0 && num <= Number.MAX_SAFE_INTEGER;
   };
 
   const { address } = useAccount();
   const queryClient = useQueryClient();
-  const { buyFromBondingCurve, isPending: isBuyingPending } =
+  const { buyFromBondingCurve, isLoading: isBuyingPending } =
     useBuyFromBondingCurve();
   const { sellFromBondingCurve, isPending: isSellingPending } =
     useSellFromBondingCurve();
 
+  const { authenticated } = usePrivy();
+
   const { data: purchaseReturn } = useReadContract({
     address: bondingCurveAddress,
-    abi: abis.FM_BC_Bancor_Gaia_v1,
+    abi: abis.FM_BC_Bancor_Launchpad_v1,
     functionName: "calculatePurchaseReturn",
-    args: buyAmount && isValidAmount(buyAmount) ? [parseEther(buyAmount)] : undefined,
+    args:
+      buyAmount && isValidAmount(buyAmount)
+        ? [parseEther(buyAmount)]
+        : undefined,
     query: {
-      enabled:
-        !!bondingCurveAddress && !!buyAmount && isValidAmount(buyAmount),
+      enabled: !!bondingCurveAddress && !!buyAmount && isValidAmount(buyAmount),
     },
   });
 
   const { data: saleReturn } = useReadContract({
     address: bondingCurveAddress,
-    abi: abis.FM_BC_Bancor_Gaia_v1,
+    abi: abis.FM_BC_Bancor_Launchpad_v1,
     functionName: "calculateSaleReturn",
-    args: sellAmount && isValidAmount(sellAmount) ? [parseEther(sellAmount)] : undefined,
+    args:
+      sellAmount && isValidAmount(sellAmount)
+        ? [parseEther(sellAmount)]
+        : undefined,
     query: {
       enabled:
         !!bondingCurveAddress && !!sellAmount && isValidAmount(sellAmount),
@@ -99,20 +107,29 @@ export function TradingPanel({
         <div className="flex flex-col gap-1">
           <div>Successfully bought tokens!</div>
           <Link
-            href={`https://sepolia.etherscan.io/tx/${result.txid}`}
+            href={`${EXPLORER_URL}/tx/${result.txid}`}
             target="_blank"
             className="text-blue-400 hover:text-blue-300 underline text-sm"
           >
-            View transaction: {result.txid.slice(0, 10)}...{result.txid.slice(-4)}
+            View transaction: {result.txid.slice(0, 10)}...
+            {result.txid.slice(-4)}
           </Link>
         </div>
       );
 
       // Refresh candles, transactions, market cap, and holders data
-      queryClient.invalidateQueries({ queryKey: ["candles", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["bonding-curve-transactions", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["market-cap", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["token-holders", bondingCurveAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ["candles", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["bonding-curve-transactions", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["market-cap", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["token-holders", bondingCurveAddress],
+      });
 
       // Reset buy amount to default
       setBuyAmount("1");
@@ -152,20 +169,29 @@ export function TradingPanel({
         <div className="flex flex-col gap-1">
           <div>Successfully sold tokens!</div>
           <Link
-            href={`https://sepolia.etherscan.io/tx/${result.txid}`}
+            href={`${EXPLORER_URL}/tx/${result.txid}`}
             target="_blank"
             className="text-blue-400 hover:text-blue-300 underline text-sm"
           >
-            View transaction: {result.txid.slice(0, 10)}...{result.txid.slice(-4)}
+            View transaction: {result.txid.slice(0, 10)}...
+            {result.txid.slice(-4)}
           </Link>
         </div>
       );
 
       // Refresh candles, transactions, market cap, and holders data
-      queryClient.invalidateQueries({ queryKey: ["candles", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["bonding-curve-transactions", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["market-cap", bondingCurveAddress] });
-      queryClient.invalidateQueries({ queryKey: ["token-holders", bondingCurveAddress] });
+      queryClient.invalidateQueries({
+        queryKey: ["candles", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["bonding-curve-transactions", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["market-cap", bondingCurveAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["token-holders", bondingCurveAddress],
+      });
 
       // Reset sell amount to default
       setSellAmount("0");
@@ -225,7 +251,7 @@ export function TradingPanel({
                   className="text-lg md:text-xl h-12 md:h-14 pl-4 pr-12 md:pr-16 border-2 focus:border-green-500 transition-colors [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                 />
                 <div className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 text-xs md:text-sm text-neutral-400 font-medium">
-                  GAIA
+                  LAUNCHPAD
                 </div>
               </div>
 
@@ -248,7 +274,7 @@ export function TradingPanel({
                     className="h-8 md:h-10 text-xs md:text-sm hover:bg-green-50 hover:border-green-300 hover:text-green-700 transition-colors"
                     onClick={() => setBuyAmount(amount)}
                   >
-                    {amount} GAIA
+                    {amount} LP
                   </Button>
                 ))}
               </div>
@@ -276,13 +302,14 @@ export function TradingPanel({
               </div>
 
               <Button
-                className="w-full h-10 md:h-12 bg-green-600 hover:bg-green-700 text-white font-medium text-sm md:text-base"
+                className="w-full h-10 md:h-12 bg-green-600 hover:bg-green-700 text-white font-medium text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleBuy}
                 disabled={
                   isBuying ||
                   isBuyingPending ||
                   !bondingCurveAddress ||
-                  !purchaseReturn
+                  !purchaseReturn ||
+                  !authenticated
                 }
               >
                 <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-2" />
@@ -311,12 +338,11 @@ export function TradingPanel({
               </div>
 
               <div className="text-xs md:text-sm text-neutral-400 text-center">
-                ≈ $GAIA {" "}
+                ≈ $LAUNCHPAD{" "}
                 {saleReturn
-                  ? Number(formatEther(saleReturn)).toLocaleString(
-                      undefined,
-                      { maximumFractionDigits: 5 }
-                    )
+                  ? Number(formatEther(saleReturn)).toLocaleString(undefined, {
+                      maximumFractionDigits: 5,
+                    })
                   : "0"}
               </div>
 
@@ -346,7 +372,7 @@ export function TradingPanel({
                             { maximumFractionDigits: 5 }
                           )
                         : "0"}{" "}
-                      GAIA
+                      LAUNCHPAD
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-1">
@@ -357,17 +383,18 @@ export function TradingPanel({
               </div>
 
               <Button
-                className="w-full h-10 md:h-12 bg-orange-600 hover:bg-orange-700 text-white font-medium text-sm md:text-base"
+                className="w-full h-10 md:h-12 bg-orange-600 hover:bg-orange-700 text-white font-medium text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleSell}
                 disabled={
                   isSelling ||
                   isSellingPending ||
                   !bondingCurveAddress ||
-                  !sellAmount
+                  !sellAmount ||
+                  !authenticated
                 }
               >
                 <TrendingDown className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-                PLACE SELL ORDER
+                {isSelling ? "SELLING..." : "PLACE SELL ORDER"}
               </Button>
             </div>
           </TabsContent>
